@@ -4,13 +4,13 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.vulkanmod.vulkan.shader.descriptor.ImageDescriptor;
 import net.vulkanmod.vulkan.shader.descriptor.UBO;
 import net.vulkanmod.vulkan.shader.layout.AlignedStruct;
+import net.vulkanmod.vulkan.texture.VTextureSelector;
 import org.lwjgl.vulkan.VK11;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class UniformParser {
-
     private final GlslConverter converterInstance;
     private final StageUniforms[] stageUniforms = new StageUniforms[GlslConverter.ShaderStage.values().length];
     private StageUniforms currentUniforms;
@@ -126,7 +126,11 @@ public class UniformParser {
 
         for (StageUniforms stageUniforms : this.stageUniforms) {
             for (Uniform uniform : stageUniforms.samplers) {
-                int imageIdx = currentLocation - offset;
+                int imageIdx = VTextureSelector.getTextureIdx(uniform.name);
+                if (imageIdx == -1) {
+                    imageIdx = currentLocation - offset;
+                }
+
                 imageDescriptors.add(new ImageDescriptor(currentLocation, uniform.type, uniform.name, imageIdx));
                 currentLocation++;
             }
@@ -137,13 +141,14 @@ public class UniformParser {
 
     public static String removeSemicolon(String s) {
         int last = s.length() - 1;
-        if ((s.charAt(last)) != ';')
+        if ((s.charAt(last)) != ';') {
             throw new IllegalArgumentException("last char is not ;");
+        }
         return s.substring(0, last);
     }
 
     public List<Uniform> getGlobalUniforms() {
-        return globalUniforms;
+        return this.globalUniforms;
     }
 
     public List<ImageDescriptor> getSamplers() {

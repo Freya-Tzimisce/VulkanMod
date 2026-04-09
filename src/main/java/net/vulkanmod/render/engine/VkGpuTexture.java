@@ -12,8 +12,10 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.vulkanmod.gl.VkGlTexture;
+import net.vulkanmod.vulkan.texture.SamplerManager;
 import net.vulkanmod.vulkan.texture.VulkanImage;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.vulkan.VK10;
 
 @Environment(EnvType.CLIENT)
@@ -58,23 +60,33 @@ public class VkGpuTexture extends GlTexture {
 
 	public void flushModeChanges() {
 		if (this.modesDirty) {
-			GlStateManager._texParameter(3553, 10242, GlConst.toGl(this.addressModeU));
-			GlStateManager._texParameter(3553, 10243, GlConst.toGl(this.addressModeV));
-			switch (this.minFilter) {
-				case NEAREST:
-					GlStateManager._texParameter(3553, 10241, this.useMipmaps ? 9986 : 9728);
-					break;
-				case LINEAR:
-					GlStateManager._texParameter(3553, 10241, this.useMipmaps ? 9987 : 9729);
-			}
+			// GlStateManager._texParameter(3553, 10242, GlConst.toGl(this.addressModeU));
+			// GlStateManager._texParameter(3553, 10243, GlConst.toGl(this.addressModeV));
+			// switch (this.minFilter) {
+			//     case NEAREST:
+			//         GlStateManager._texParameter(3553, 10241, this.useMipmaps ? 9986 : 9728);
+			//         break;
+			//     case LINEAR:
+			//         GlStateManager._texParameter(3553, 10241, this.useMipmaps ? 9987 : 9729);
+			// }
 
-			switch (this.magFilter) {
-				case NEAREST:
-					GlStateManager._texParameter(3553, 10240, 9728);
-					break;
-				case LINEAR:
-					GlStateManager._texParameter(3553, 10240, 9729);
-			}
+			// switch (this.magFilter) {
+			//     case NEAREST:
+			//         GlStateManager._texParameter(3553, 10240, 9728);
+			//         break;
+			//     case LINEAR:
+			//         GlStateManager._texParameter(3553, 10240, 9729);
+			// }
+
+			byte samplerFlags = (byte) (this.magFilter == FilterMode.LINEAR ? SamplerManager.LINEAR_FILTERING_BIT : 0);
+
+			samplerFlags = (byte) (samplerFlags | switch (this.minFilter) {
+				case LINEAR -> 12;
+				case NEAREST -> 4;
+				default -> 0;
+			});
+
+			glTexture.getVulkanImage().updateTextureSampler(this.getMipLevels(), samplerFlags);
 
 			this.modesDirty = false;
 		}

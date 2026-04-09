@@ -74,7 +74,7 @@ public abstract class VTextureSelector {
             case "Sampler5" -> 5;
             case "Sampler6" -> 6;
             case "Sampler7" -> 7;
-            default -> throw new IllegalStateException("Unknown sampler name: " + name);
+            default -> -1;
         };
     }
 
@@ -83,17 +83,16 @@ public abstract class VTextureSelector {
 
         for (ImageDescriptor state : imageDescriptors) {
             VkGpuTexture gpuTexture = (VkGpuTexture) RenderSystem.getShaderTexture(state.imageIdx);
-            // gpuTexture.flushModeChanges();
 
-            if (gpuTexture == null)
-                continue;
+            if (gpuTexture != null) {
+                gpuTexture.flushModeChanges();
+                final int shaderTexture = gpuTexture.glId();
 
-            final int shaderTexture = gpuTexture.glId();
+                VkGlTexture texture = VkGlTexture.getTexture(shaderTexture);
 
-            VkGlTexture texture = VkGlTexture.getTexture(shaderTexture);
-
-            if (texture != null && texture.getVulkanImage() != null) {
-                VTextureSelector.bindTexture(state.imageIdx, texture.getVulkanImage());
+                if (texture != null && texture.getVulkanImage() != null) {
+                    VTextureSelector.bindTexture(state.imageIdx, texture.getVulkanImage());
+                }
             }
             // TODO
             // else {
