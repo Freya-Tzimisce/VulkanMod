@@ -54,14 +54,14 @@ public abstract class LightDataAccess {
 
     public int get(int x, int y, int z, SimpleDirection d1, SimpleDirection d2) {
         return this.get(x + d1.getStepX() + d2.getStepX(),
-                        y + d1.getStepY() + d2.getStepY(),
-                        z + d1.getStepZ() + d2.getStepZ());
+                y + d1.getStepY() + d2.getStepY(),
+                z + d1.getStepZ() + d2.getStepZ());
     }
 
     public int get(int x, int y, int z, SimpleDirection dir) {
         return this.get(x + dir.getStepX(),
-                        y + dir.getStepY(),
-                        z + dir.getStepZ());
+                y + dir.getStepY(),
+                z + dir.getStepZ());
     }
 
     public int get(BlockPos pos, SimpleDirection dir) {
@@ -88,9 +88,9 @@ public abstract class LightDataAccess {
         if (this.subBlockLighting)
             op = state.canOcclude();
         else
-            op = state.isViewBlocking(region, pos) && state.getLightBlock(region, pos) != 0;
+            op = state.isViewBlocking(region, pos) && state.getLightBlock() != 0;
 
-        boolean fo = state.isSolidRender(region, pos);
+        boolean fo = state.isSolidRender();
         boolean fc = state.isCollisionShapeFullBlock(region, pos);
 
         int lu = state.getLightEmission();
@@ -108,7 +108,7 @@ public abstract class LightDataAccess {
                 sl = region.getBrightness(LightLayer.SKY, pos);
             }
             else {
-                int light = LevelRenderer.getLightColor(region, state, pos);
+                int light = LevelRenderer.getLightColor(LevelRenderer.BrightnessGetter.DEFAULT, region, state, pos);
                 bl = LightTexture.block(light);
                 sl = LightTexture.sky(light);
             }
@@ -217,8 +217,7 @@ public abstract class LightDataAccess {
     public static int getEmissiveLightmap(int word) {
         if (unpackEM(word)) {
             return LightTexture.FULL_BRIGHT;
-        }
-        else {
+        } else {
             return getLightmap(word);
         }
     }

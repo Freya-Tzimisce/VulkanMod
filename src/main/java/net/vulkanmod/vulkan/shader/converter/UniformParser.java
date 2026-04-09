@@ -24,7 +24,7 @@ public class UniformParser {
     public UniformParser(GlslConverter converterInstance) {
         this.converterInstance = converterInstance;
 
-        for (int i = 0; i < this.stageUniforms.length; ++i) {
+        for (int i = 0; i < this.stageUniforms.length; i++) {
             this.stageUniforms[i] = new StageUniforms();
         }
     }
@@ -66,18 +66,20 @@ public class UniformParser {
     private void resetSate() {
         this.type = null;
         this.name = null;
-//        this.state = State.None;
+        // this.state = State.None;
     }
 
     public String createUniformsCode() {
         StringBuilder builder = new StringBuilder();
 
-        //hardcoded 0 binding as it should always be 0 in this case
-        builder.append(String.format("layout(binding = %d) uniform UniformBufferObject {\n", 0));
-        for (Uniform uniform : this.globalUniforms) {
-            builder.append(String.format("%s %s;\n", uniform.type, uniform.name));
+        if (!this.globalUniforms.isEmpty()) {
+            //hardcoded 0 binding as it should always be 0 in this case
+            builder.append(String.format("layout(binding = %d) uniform UniformBufferObject {\n", 0));
+            for (Uniform uniform : this.globalUniforms) {
+                builder.append(String.format("%s %s;\n", uniform.type, uniform.name));
+            }
+            builder.append("};\n\n");
         }
-        builder.append("};\n\n");
 
         return builder.toString();
     }
@@ -89,7 +91,7 @@ public class UniformParser {
 
         for (ImageDescriptor imageDescriptor : this.imageDescriptors) {
             builder.append(String.format("layout(binding = %d) uniform %s %s;\n", imageDescriptor.getBinding(),
-                                         imageDescriptor.qualifier, imageDescriptor.name));
+                    imageDescriptor.qualifier, imageDescriptor.name));
         }
         builder.append("\n");
 
@@ -97,6 +99,10 @@ public class UniformParser {
     }
 
     public UBO createUBO() {
+        if (this.globalUniforms.isEmpty()) {
+            return null;
+        }
+
         AlignedStruct.Builder builder = new AlignedStruct.Builder();
 
         for (UniformParser.Uniform uniform : this.globalUniforms) {
@@ -109,17 +115,18 @@ public class UniformParser {
         }
 
         // Use binding 0 for global uniforms
-        return builder.buildUBO(0, VK11.VK_SHADER_STAGE_ALL);
+        return builder.buildUBO(0, Integer.MAX_VALUE);
     }
 
     private List<ImageDescriptor> createSamplerList() {
-        int currentLocation = 1;
+        int offset = this.globalUniforms.isEmpty() ? 0 : 1;
+        int currentLocation = offset;
 
         List<ImageDescriptor> imageDescriptors = new ObjectArrayList<>();
 
         for (StageUniforms stageUniforms : this.stageUniforms) {
             for (Uniform uniform : stageUniforms.samplers) {
-                int imageIdx = currentLocation - 1;
+                int imageIdx = currentLocation - offset;
                 imageDescriptors.add(new ImageDescriptor(currentLocation, uniform.type, uniform.name, imageIdx));
                 currentLocation++;
             }

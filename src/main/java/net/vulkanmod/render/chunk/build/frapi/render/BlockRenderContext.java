@@ -5,7 +5,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
 import net.fabricmc.fabric.api.renderer.v1.material.ShadeMode;
 import net.fabricmc.fabric.api.util.TriState;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -20,11 +22,9 @@ import net.vulkanmod.render.chunk.build.light.flat.FlatLightPipeline;
 import net.vulkanmod.render.chunk.build.light.smooth.NewSmoothLightPipeline;
 import net.vulkanmod.render.chunk.build.light.smooth.SmoothLightPipeline;
 
-/**
- * Context for non-terrain block rendering.
- */
 public class BlockRenderContext extends AbstractBlockRenderContext {
-	private VertexConsumer vertexConsumer;
+	public static final ThreadLocal<BlockRenderContext> POOL = ThreadLocal.withInitial(BlockRenderContext::new);
+	private MultiBufferSource vertexConsumers;
 
 	private final ArrayLightDataCache lightDataCache = new ArrayLightDataCache();
 
@@ -40,45 +40,47 @@ public class BlockRenderContext extends AbstractBlockRenderContext {
 		}
 
 		this.setupLightPipelines(flatLightPipeline, smoothLightPipeline);
-    }
+		this.random = RandomSource.create();
+	}
 
-	public void render(BlockAndTintGetter blockView, BakedModel model, BlockState state, BlockPos pos, PoseStack matrixStack, VertexConsumer buffer, boolean cull, RandomSource random, long seed, int overlay) {
-		Vec3 offset = state.getOffset(blockView, pos);
+	public void render(BlockAndTintGetter blockView, BlockStateModel model, BlockState state, BlockPos pos, PoseStack matrixStack, MultiBufferSource buffers, boolean cull, long seed, int overlay) {
+		Vec3 offset = state.getOffset(pos);
 		matrixStack.translate(offset.x, offset.y, offset.z);
 
 		this.blockPos = pos;
-		this.vertexConsumer = buffer;
-		this.matrix = matrixStack.last().pose();
-		this.normalMatrix = matrixStack.last().normal();
+		this.vertexConsumers = buffers;
+		this.matrices = matrixStack.last();
 		this.overlay = overlay;
 
-		this.random = random;
-		this.seed = seed;
+		this.random.setSeed(seed);
 
 		this.lightDataCache.reset(blockView, pos);
 
 		this.prepareForWorld(blockView, cull);
-		this.prepareForBlock(state, pos, model.useAmbientOcclusion());
+		this.prepareForBlock(state, pos, state.getLightEmission() == 0);
 
-		model.emitBlockQuads(blockView, state, pos, this.randomSupplier, this);
+		model.emitQuads(getEmitter(), blockView, pos, state, this.random, this::isFaceCulled);
+		this.vertexConsumers = null;
+	}
 
-		this.vertexConsumer = null;
+	@Override
+	protected VertexConsumer getVertexConsumer(RenderType renderType) {
+		return this.vertexConsumers.getBuffer(renderType);
 	}
 
 	protected void endRenderQuad(MutableQuadViewImpl quad) {
 		final RenderMaterial mat = quad.material();
-		final int colorIndex = mat.disableColorIndex() ? -1 : quad.colorIndex();
 		final TriState aoMode = mat.ambientOcclusion();
 		final boolean ao = this.useAO && (aoMode == TriState.TRUE || (aoMode == TriState.DEFAULT && this.defaultAO));
 		final boolean emissive = mat.emissive();
 		final boolean vanillaShade = mat.shadeMode() == ShadeMode.VANILLA;
-
+		VertexConsumer vertexConsumer = this.getVertexConsumer(this.effectiveRenderType(mat.blendMode()));
 		LightPipeline lightPipeline = ao ? this.smoothLightPipeline : this.flatLightPipeline;
 
-		colorizeQuad(quad, colorIndex);
+		tintQuad(quad);
 		shadeQuad(quad, lightPipeline, emissive, vanillaShade);
 		copyLightData(quad);
-        bufferQuad(quad, vertexConsumer);
+		bufferQuad(quad, vertexConsumer);
 	}
 
 	private void copyLightData(MutableQuadViewImpl quad) {

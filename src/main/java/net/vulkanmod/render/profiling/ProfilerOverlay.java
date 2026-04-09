@@ -12,6 +12,7 @@ import net.vulkanmod.config.gui.GuiRenderer;
 import net.vulkanmod.render.chunk.WorldRenderer;
 import net.vulkanmod.render.chunk.build.task.ChunkTask;
 import net.vulkanmod.render.chunk.build.thread.BuilderResources;
+import net.vulkanmod.vulkan.VRenderSystem;
 import net.vulkanmod.vulkan.memory.MemoryManager;
 import net.vulkanmod.vulkan.util.ColorUtil;
 
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class ProfilerOverlay {
+
     private static final long POLL_PERIOD = 100000000;
 
     public static ProfilerOverlay INSTANCE;
@@ -67,7 +69,7 @@ public class ProfilerOverlay {
 
         Objects.requireNonNull(this.font);
 
-        RenderSystem.enableBlend();
+        VRenderSystem.enableBlend();
         GuiRenderer.beginBatch();
 
         for (int i = 0; i < infoList.size(); ++i) {
@@ -83,7 +85,7 @@ public class ProfilerOverlay {
         }
 
         GuiRenderer.endBatch();
-        RenderSystem.disableBlend();
+        VRenderSystem.disableBlend();
 
         for (int i = 0; i < infoList.size(); ++i) {
             String line = infoList.get(i);

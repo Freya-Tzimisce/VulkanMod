@@ -1,21 +1,19 @@
 package net.vulkanmod.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.buffers.BufferUsage;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ShaderInstance;
 import net.vulkanmod.vulkan.Renderer;
-import net.vulkanmod.vulkan.VRenderSystem;
-import net.vulkanmod.vulkan.memory.*;
+import net.vulkanmod.vulkan.memory.MemoryType;
+import net.vulkanmod.vulkan.memory.MemoryTypes;
 import net.vulkanmod.vulkan.memory.buffer.IndexBuffer;
 import net.vulkanmod.vulkan.memory.buffer.VertexBuffer;
 import net.vulkanmod.vulkan.memory.buffer.index.AutoIndexBuffer;
 import net.vulkanmod.vulkan.shader.GraphicsPipeline;
+import net.vulkanmod.vulkan.shader.Pipeline;
 import net.vulkanmod.vulkan.texture.VTextureSelector;
-import org.joml.Matrix4f;
 
 import java.nio.ByteBuffer;
 
@@ -25,13 +23,14 @@ public class VBO {
     private VertexBuffer vertexBuffer;
     private IndexBuffer indexBuffer;
 
-    private VertexFormat.Mode mode;
-    private boolean autoIndexed = false;
     private int indexCount;
     private int vertexCount;
+    private VertexFormat.Mode mode;
 
-    public VBO(com.mojang.blaze3d.vertex.VertexBuffer.Usage usage) {
-       this.memoryType = usage == com.mojang.blaze3d.vertex.VertexBuffer.Usage.STATIC ? MemoryTypes.GPU_MEM : MemoryTypes.HOST_MEM;
+    private boolean autoIndexed = false;
+
+    public VBO(BufferUsage usage) {
+        this.memoryType = usage == BufferUsage.STATIC_WRITE ? MemoryTypes.GPU_MEM : MemoryTypes.HOST_MEM;
     }
 
     public void upload(MeshData meshData) {
@@ -49,8 +48,9 @@ public class VBO {
 
     private void uploadVertexBuffer(MeshData.DrawState parameters, ByteBuffer data) {
         if (data != null) {
-            if (this.vertexBuffer != null)
+            if (this.vertexBuffer != null) {
                 this.vertexBuffer.scheduleFree();
+            }
 
             int size = parameters.format().getVertexSize() * parameters.vertexCount();
             this.vertexBuffer = new VertexBuffer(size, this.memoryType);
@@ -96,8 +96,8 @@ public class VBO {
             }
 
             this.autoIndexed = true;
-        }
-        else {
+
+        } else {
             if (this.indexBuffer != null && !this.autoIndexed) {
                 this.indexBuffer.scheduleFree();
             }
@@ -105,81 +105,41 @@ public class VBO {
             this.indexBuffer = new IndexBuffer(data.remaining(), MemoryTypes.GPU_MEM);
             this.indexBuffer.copyBuffer(data, data.remaining());
         }
+
     }
 
-    public void drawWithShader(Matrix4f modelView, Matrix4f projection, ShaderInstance shaderInstance) {
-        if (this.indexCount != 0) {
-            RenderSystem.assertOnRenderThread();
-
-            RenderSystem.setShader(() -> shaderInstance);
-
-            VRenderSystem.applyMVP(modelView, projection);
-            VRenderSystem.setPrimitiveTopologyGL(this.mode.asGLMode);
-
-            shaderInstance.setDefaultUniforms(VertexFormat.Mode.QUADS, modelView, projection, Minecraft.getInstance().getWindow());
-            shaderInstance.apply();
-
-            if (this.indexBuffer != null) {
-                Renderer.getDrawer().drawIndexed(this.vertexBuffer, this.indexBuffer, this.indexCount);
-            }
-            else {
-                Renderer.getDrawer().draw(this.vertexBuffer, this.vertexCount);
-            }
-
-            // Reset MVP to previous state
-            VRenderSystem.applyMVP(RenderSystem.getModelViewMatrix(), RenderSystem.getProjectionMatrix());
-        }
-    }
-
-    public void drawWithShader(Matrix4f modelView, Matrix4f projection, GraphicsPipeline pipeline) {
-        if (this.indexCount != 0) {
-            RenderSystem.assertOnRenderThread();
-
-            VRenderSystem.applyMVP(modelView, projection);
-            VRenderSystem.setPrimitiveTopologyGL(this.mode.asGLMode);
-
-            Renderer renderer = Renderer.getInstance();
-            renderer.bindGraphicsPipeline(pipeline);
-            VTextureSelector.bindShaderTextures(pipeline);
-            renderer.uploadAndBindUBOs(pipeline);
-
-            if (this.indexBuffer != null) {
-                Renderer.getDrawer().drawIndexed(this.vertexBuffer, this.indexBuffer, this.indexCount);
-            }
-            else {
-                Renderer.getDrawer().draw(this.vertexBuffer, this.vertexCount);
-            }
-
-            // Reset MVP to previous state
-            VRenderSystem.applyMVP(RenderSystem.getModelViewMatrix(), RenderSystem.getProjectionMatrix());
-        }
+    public void bind(GraphicsPipeline pipeline) {
+        Renderer renderer = Renderer.getInstance();
+        renderer.bindGraphicsPipeline(pipeline);
+        VTextureSelector.bindShaderTextures(pipeline);
+        renderer.uploadAndBindUBOs(pipeline);
     }
 
     public void draw() {
         if (this.indexCount != 0) {
+            Renderer renderer = Renderer.getInstance();
+            Pipeline pipeline = renderer.getBoundPipeline();
+            renderer.uploadAndBindUBOs(pipeline);
             if (this.indexBuffer != null) {
                 Renderer.getDrawer().drawIndexed(this.vertexBuffer, this.indexBuffer, this.indexCount);
-            }
-            else {
+            } else {
                 Renderer.getDrawer().draw(this.vertexBuffer, this.vertexCount);
             }
         }
     }
 
     public void close() {
-        if (this.vertexCount <= 0)
-            return;
+        if (this.vertexCount > 0) {
+            this.vertexBuffer.scheduleFree();
+            this.vertexBuffer = null;
 
-        this.vertexBuffer.scheduleFree();
-        this.vertexBuffer = null;
+            if (!this.autoIndexed) {
+                this.indexBuffer.scheduleFree();
+                this.indexBuffer = null;
+            }
 
-        if (!this.autoIndexed) {
-            this.indexBuffer.scheduleFree();
-            this.indexBuffer = null;
+            this.vertexCount = 0;
+            this.indexCount = 0;
         }
-
-        this.vertexCount = 0;
-        this.indexCount = 0;
     }
-
 }

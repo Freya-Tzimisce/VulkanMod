@@ -3,6 +3,7 @@ package net.vulkanmod.config.option;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.*;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ParticleStatus;
 import net.vulkanmod.Initializer;
 import net.vulkanmod.config.Config;
 import net.vulkanmod.config.gui.OptionBlock;
@@ -84,7 +85,7 @@ public abstract class Options {
                                 value -> {
                                     boolean exclusiveFullscreen = value == WindowMode.EXCLUSIVE_FULLSCREEN;
                                     minecraftOptions.fullscreen()
-                                                    .set(exclusiveFullscreen);
+                                            .set(exclusiveFullscreen);
 
                                     config.windowMode = value.mode;
                                     fullscreenDirty = true;
@@ -94,11 +95,13 @@ public abstract class Options {
                         new RangeOption(Component.translatable("options.framerateLimit"),
                                 10, 260, 10,
                                 value -> Component.nullToEmpty(value == 260 ?
-                                        Component.translatable("options.framerateLimit.max").getString() :
+                                        Component.translatable(
+                                                "options.framerateLimit.max")
+                                        .getString() :
                                         String.valueOf(value)),
                                 value -> {
                                     minecraftOptions.framerateLimit().set(value);
-                                    window.setFramerateLimit(value);
+                                    minecraft.getFramerateLimitTracker().setFramerateLimit(value);
                                 },
                                 () -> minecraftOptions.framerateLimit().get()),
                         new SwitchOption(Component.translatable("options.vsync"),
@@ -107,6 +110,11 @@ public abstract class Options {
                                     window.updateVsync(value);
                                 },
                                 () -> minecraftOptions.enableVsync().get()),
+                        new CyclingOption<>(Component.translatable("options.inactivityFpsLimit"),
+                                InactivityFpsLimit.values(),
+                                value -> minecraftOptions.inactivityFpsLimit().set(value),
+                                () -> minecraftOptions.inactivityFpsLimit().get())
+                                .setTranslator(inactivityFpsLimit -> Component.translatable(inactivityFpsLimit.getKey()))
                 }),
                 new OptionBlock("", new Option<?>[]{
                         new RangeOption(Component.translatable("options.guiScale"),
@@ -279,12 +287,12 @@ public abstract class Options {
         return new OptionBlock[]{
                 new OptionBlock("", new Option[]{
                         new RangeOption(Component.translatable("vulkanmod.options.builderThreads"),
-                                        0, (Runtime.getRuntime().availableProcessors() - 1), 1,
-                                        value -> {
-                                            config.builderThreads = value;
-                                            WorldRenderer.getInstance().getTaskDispatcher().createThreads(value);
-                                        },
-                                        () -> config.builderThreads)
+                                0, (Runtime.getRuntime().availableProcessors() - 1), 1,
+                                value -> {
+                                    config.builderThreads = value;
+                                    WorldRenderer.getInstance().getTaskDispatcher().createThreads(value);
+                                },
+                                () -> config.builderThreads)
                                 .setTranslator(value -> {
                             if (value == 0)
                                 return Component.translatable("vulkanmod.options.builderThreads.auto");
@@ -299,12 +307,14 @@ public abstract class Options {
                                 }, () -> config.frameQueueSize)
                                 .setTooltip(Component.translatable("vulkanmod.options.frameQueue.tooltip")),
                         new CyclingOption<>(Component.translatable("vulkanmod.options.deviceSelector"),
-                                IntStream.range(-1, DeviceManager.suitableDevices.size()).boxed().toArray(Integer[]::new),
+                                IntStream.range(-1, DeviceManager.suitableDevices.size()).boxed()
+                                        .toArray(Integer[]::new),
                                 value -> config.device = value,
                                 () -> config.device)
                                 .setTranslator(value -> Component.translatable((value == -1)
                                         ? "vulkanmod.options.deviceSelector.auto"
-                                        : DeviceManager.suitableDevices.get(value).deviceName)
+                                        : DeviceManager.suitableDevices.get(
+                                        value).deviceName)
                                 )
                                 .setTooltip(Component.nullToEmpty("%s: %s".formatted(
                                         Component.translatable("vulkanmod.options.deviceSelector.tooltip").getString(),

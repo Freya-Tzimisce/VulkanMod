@@ -61,6 +61,8 @@ public abstract class VRenderSystem {
 
     public static void initRenderer() {
         Vulkan.initVulkan(window);
+
+        setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     public static MappedBuffer getScreenSize() {
@@ -175,7 +177,7 @@ public abstract class VRenderSystem {
 
     public static void setPrimitiveTopologyGL(final int mode) {
         VRenderSystem.topology = switch (mode) {
-            case GL11.GL_LINES, GL11.GL_LINE_STRIP  -> VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+            case GL11.GL_LINES, GL11.GL_LINE_STRIP -> VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
             case GL11.GL_TRIANGLE_FAN, GL11.GL_TRIANGLES, GL11.GL_TRIANGLE_STRIP -> VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
             default -> throw new RuntimeException(String.format("Unknown GL primitive topology: %s", mode));
         };

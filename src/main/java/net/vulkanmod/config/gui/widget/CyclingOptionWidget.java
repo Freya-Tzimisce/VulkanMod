@@ -1,13 +1,18 @@
 package net.vulkanmod.config.gui.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.vulkanmod.config.gui.GuiRenderer;
 import net.vulkanmod.config.option.CyclingOption;
+import net.vulkanmod.vulkan.VRenderSystem;
 import net.vulkanmod.vulkan.util.ColorUtil;
 import org.joml.Matrix4f;
 
@@ -23,21 +28,22 @@ public class CyclingOptionWidget extends OptionWidget<CyclingOption<?>> {
         this.leftButton = new Button(this.controlX, 16, Button.Direction.LEFT);
         this.rightButton = new Button(this.controlX + this.controlWidth - 16, 16, Button.Direction.RIGHT);
 
-//        updateDisplayedValue(option.getValueText());
+        // updateDisplayedValue(option.getValueText());
     }
 
     @Override
     protected int getYImage(boolean hovered) {
-        return  0;
+        return 0;
     }
 
+    @Override
     public void renderControls(double mouseX, double mouseY) {
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         this.renderBars();
 
-        this.leftButton.setStatus(option.index() > 0);
-        this.rightButton.setStatus(option.index() < option.getValues().length - 1);
+        this.leftButton.setStatus(this.option.index() > 0);
+        this.rightButton.setStatus(this.option.index() < this.option.getValues().length - 1);
 
         int color = this.active ? 0xFFFFFF : 0xA0A0A0;
         Font textRenderer = Minecraft.getInstance().font;
@@ -50,8 +56,8 @@ public class CyclingOptionWidget extends OptionWidget<CyclingOption<?>> {
     }
 
     public void renderBars() {
-        int count = option.getValues().length;
-        int current = option.index();
+        int count = this.option.getValues().length;
+        int current = this.option.index();
 
         int margin = 30;
         int padding = 4;
@@ -60,36 +66,32 @@ public class CyclingOptionWidget extends OptionWidget<CyclingOption<?>> {
         int color = ColorUtil.ARGB.pack(1.0f, 1.0f, 1.0f, 0.4f);
         int activeColor = ColorUtil.ARGB.pack(1.0f, 1.0f, 1.0f, 1.0f);
 
-        if (barWidth <= 0)
-            return;
+        if (barWidth > 0) {
+            for (int i = 0; i < count; i++) {
+                float x0 = this.controlX + margin + i * (barWidth + padding);
+                float y0 = this.y + this.height - 5.0f;
 
-        for (int i = 0; i < count; i++) {
-            float x0 = this.controlX + margin + i * (barWidth + padding);
-            float y0 = this.y + this.height - 5.0f;
-
-            int c = i == current ? activeColor : color;
-            GuiRenderer.fill(x0, y0, x0 + barWidth, y0 + 1.5f, c);
+                int c = i == current ? activeColor : color;
+                GuiRenderer.fill(x0, y0, x0 + barWidth, y0 + 1.5f, c);
+            }
         }
     }
 
     @Override
     public void onClick(double mouseX, double mouseY) {
-        if (leftButton.isHovered(mouseX, mouseY)) {
-            option.prevValue();
-        }
-        else if (rightButton.isHovered(mouseX, mouseY)) {
-            option.nextValue();
+        if (this.leftButton.isHovered(mouseX, mouseY)) {
+            this.option.prevValue();
+        } else if (this.rightButton.isHovered(mouseX, mouseY)) {
+            this.option.nextValue();
         }
     }
 
     @Override
     public void onRelease(double mouseX, double mouseY) {
-
     }
 
     @Override
     protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
-
     }
 
     @Override
@@ -116,7 +118,10 @@ public class CyclingOptionWidget extends OptionWidget<CyclingOption<?>> {
         }
 
         boolean isHovered(double mouseX, double mouseY) {
-            return mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
+            return mouseX >= x
+                    && mouseX <= x + width
+                    && mouseY >= y
+                    && mouseY <= y + height;
         }
 
         void setStatus(boolean status) {
@@ -125,7 +130,7 @@ public class CyclingOptionWidget extends OptionWidget<CyclingOption<?>> {
 
         void renderButton(PoseStack matrices, double mouseX, double mouseY) {
             Tesselator tesselator = Tesselator.getInstance();
-            BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION);
+            BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.TRIANGLE_STRIP, DefaultVertexFormat.POSITION_COLOR);
 
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -133,34 +138,33 @@ public class CyclingOptionWidget extends OptionWidget<CyclingOption<?>> {
 
             Matrix4f matrix4f = matrices.last().pose();
 
-            RenderSystem.setShader(GameRenderer::getPositionShader);
-            RenderSystem.enableBlend();
+            VRenderSystem.enableBlend();
 
-            if(this.isHovered(mouseX, mouseY) && this.active)
+            if (this.isHovered(mouseX, mouseY) && this.active) {
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-            else if(this.active)
+            } else if (this.active) {
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 0.8f);
-            else
+            } else {
                 RenderSystem.setShaderColor(0.3f, 0.3f, 0.3f, 0.8f);
+            }
 
-            float h = f;
+            int color = -1;
             float w = f - 1.0f;
             float yC = y + height * 0.5f;
             float xC = x + width * 0.5f;
             if (this.direction == Direction.LEFT) {
-                bufferBuilder.addVertex(matrix4f, xC - w, yC, 0);
-                bufferBuilder.addVertex(matrix4f, xC + w, yC + h, 0);
-                bufferBuilder.addVertex(matrix4f, xC + w, yC - h, 0);
+                bufferBuilder.addVertex(matrix4f, xC - w, yC, 0.0f).setColor(color);
+                bufferBuilder.addVertex(matrix4f, xC + w, yC + f, 0.0f).setColor(color);
+                bufferBuilder.addVertex(matrix4f, xC + w, yC - f, 0.0f).setColor(color);
             } else {
-                bufferBuilder.addVertex(matrix4f, xC + w, yC, 0);
-                bufferBuilder.addVertex(matrix4f, xC - w, yC - h, 0);
-                bufferBuilder.addVertex(matrix4f, xC - w, yC + h, 0);
+                bufferBuilder.addVertex(matrix4f, xC + w, yC, 0.0f).setColor(color);
+                bufferBuilder.addVertex(matrix4f, xC - w, yC - f, 0.0f).setColor(color);
+                bufferBuilder.addVertex(matrix4f, xC - w, yC + f, 0.0f).setColor(color);
             }
 
-            BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
+            RenderType.gui().draw(bufferBuilder.buildOrThrow());
 
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-            RenderSystem.setShader(GameRenderer::getPositionTexShader);
         }
 
         enum Direction {
@@ -168,5 +172,4 @@ public class CyclingOptionWidget extends OptionWidget<CyclingOption<?>> {
             RIGHT
         }
     }
-
 }

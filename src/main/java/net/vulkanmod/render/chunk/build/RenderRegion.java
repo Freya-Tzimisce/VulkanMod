@@ -105,7 +105,7 @@ public class RenderRegion implements BlockAndTintGetter, RenderAttachedBlockView
                     int tMaxZ = Math.min(maxZ, absBlockZ + 16);
 
                     loadSectionBlockStates(container, blockData,
-                                           tMinX, tMinY, tMinZ, tMaxX, tMaxY, tMaxZ);
+                            tMinX, tMinY, tMinZ, tMaxX, tMaxY, tMaxZ);
 
                 }
             }
@@ -193,8 +193,8 @@ public class RenderRegion implements BlockAndTintGetter, RenderAttachedBlockView
         return tintCache.getColor(blockPos, colorResolver);
     }
 
-    public int getMinBuildHeight() {
-        return this.level.getMinBuildHeight();
+    public int getMinY() {
+        return this.level.getMinY();
     }
 
     public int getHeight() {

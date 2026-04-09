@@ -1,11 +1,11 @@
 package net.vulkanmod.config.gui;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -15,13 +15,14 @@ import net.vulkanmod.config.gui.widget.VAbstractWidget;
 import net.vulkanmod.config.gui.widget.VButtonWidget;
 import net.vulkanmod.config.option.OptionPage;
 import net.vulkanmod.config.option.Options;
+import net.vulkanmod.vulkan.VRenderSystem;
 import net.vulkanmod.vulkan.util.ColorUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class VOptionScreen extends Screen {
-    public final static int RED = ColorUtil.ARGB.pack(0.3f, 0.0f, 0.0f, 0.8f);
+    public static final int RED = ColorUtil.ARGB.pack(0.3f, 0.0f, 0.0f, 0.8f);
     final ResourceLocation ICON = ResourceLocation.fromNamespaceAndPath("vulkanmod", "vlogo_transparent.png");
 
     private final Screen parent;
@@ -86,14 +87,14 @@ public class VOptionScreen extends Screen {
         int itemHeight = 20;
 
         int leftMargin = 100;
-//        int listWidth = (int) (this.width * 0.65f);
-        int listWidth = Math.min((int) (this.width * 0.65f), 420);
+        // int listWidth = (int) (this.width * 0.65f);
+        int listWidth = Math.min((int)(this.width * 0.65f), 420);
         int listHeight = this.height - top - bottom;
 
         this.buildLists(leftMargin, top, listWidth, listHeight, itemHeight);
 
         int x = leftMargin + listWidth + 10;
-//        int width = Math.min(this.width - this.tooltipX - 10, 200);
+        // int width = Math.min(this.width - this.tooltipX - 10, 200);
         int width = this.width - x - 10;
         int y = 50;
 
@@ -107,7 +108,7 @@ public class VOptionScreen extends Screen {
         this.tooltipY = y;
         this.tooltipWidth = width;
 
-        buildPage();
+        this.buildPage();
 
         this.applyButton.active = false;
     }
@@ -121,18 +122,19 @@ public class VOptionScreen extends Screen {
     private void addPageButtons(int x0, int y0, int width, int height, boolean verticalLayout) {
         int x = x0;
         int y = y0;
-        for (int i = 0; i < this.optionPages.size(); ++i) {
+        for (int i = 0; i < this.optionPages.size(); i++) {
             var page = this.optionPages.get(i);
-            final int finalIdx = i;
+            int finalIdx = i;
             VButtonWidget widget = new VButtonWidget(x, y, width, height, Component.nullToEmpty(page.name), button -> this.setOptionList(finalIdx));
             this.buttons.add(widget);
             this.pageButtons.add(widget);
             this.addWidget(widget);
 
-            if (verticalLayout)
+            if (verticalLayout) {
                 y += height + 1;
-            else
+            } else {
                 x += width + 1;
+            }
         }
 
         this.pageButtons.get(this.currentListIdx).setSelected(true);
@@ -143,7 +145,7 @@ public class VOptionScreen extends Screen {
         this.pageButtons.clear();
         this.clearWidgets();
 
-//        this.addPageButtons(20, 6, 60, 20, false);
+        // this.addPageButtons(20, 6, 60, 20, false);
         this.addPageButtons(10, 40, 80, 22, true);
 
         VOptionList currentList = this.optionPages.get(this.currentListIdx).getOptionList();
@@ -157,8 +159,8 @@ public class VOptionScreen extends Screen {
         int buttonHeight = 20;
         int padding = 10;
         int buttonMargin = 5;
-        int buttonWidth = minecraft.font.width(CommonComponents.GUI_DONE) + 2 * padding;
-        int x0 = (this.width - buttonWidth - rightMargin);
+        int buttonWidth = this.minecraft.font.width(CommonComponents.GUI_DONE) + 2 * padding;
+        int x0 = this.width - buttonWidth - rightMargin;
         int y0 = this.height - buttonHeight - 7;
 
         this.doneButton = new VButtonWidget(
@@ -168,8 +170,8 @@ public class VOptionScreen extends Screen {
                 button -> this.minecraft.setScreen(this.parent)
         );
 
-        buttonWidth = minecraft.font.width(Component.translatable("vulkanmod.options.buttons.apply")) + 2 * padding;
-        x0 -= (buttonWidth + buttonMargin);
+        buttonWidth = this.minecraft.font.width(Component.translatable("vulkanmod.options.buttons.apply")) + 2 * padding;
+        x0 -= buttonWidth + buttonMargin;
         this.applyButton = new VButtonWidget(
                 x0, y0,
                 buttonWidth, buttonHeight,
@@ -177,8 +179,8 @@ public class VOptionScreen extends Screen {
                 button -> this.applyOptions()
         );
 
-        buttonWidth = minecraft.font.width(Component.translatable("vulkanmod.options.buttons.kofi")) + 10;
-        x0 = (this.width - buttonWidth - rightMargin);
+        buttonWidth = this.minecraft.font.width(Component.translatable("vulkanmod.options.buttons.kofi")) + 10;
+        x0 = this.width - buttonWidth - rightMargin;
         this.supportButton = new VButtonWidget(
                 x0, 6,
                 buttonWidth, buttonHeight,
@@ -195,6 +197,7 @@ public class VOptionScreen extends Screen {
         this.addWidget(this.supportButton);
     }
 
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         for (GuiEventListener element : this.children()) {
             if (element.mouseClicked(mouseX, mouseY, button)) {
@@ -231,7 +234,7 @@ public class VOptionScreen extends Screen {
             this.renderPanorama(guiGraphics, f);
         }
 
-        this.renderBlurredBackground(f);
+        this.renderBlurredBackground();
         this.renderMenuBackground(guiGraphics);
 
     }
@@ -243,25 +246,25 @@ public class VOptionScreen extends Screen {
         GuiRenderer.guiGraphics = guiGraphics;
         GuiRenderer.setPoseStack(guiGraphics.pose());
 
-        RenderSystem.enableBlend();
+        VRenderSystem.enableBlend();
 
         int size = minecraft.font.lineHeight * 4;
 
-        guiGraphics.blit(ICON, 30, 4, 0f, 0f, size, size, size, size);
-
+        guiGraphics.blit(RenderType::guiTextured, this.ICON, 30, 4, 0.0f, 0.0f, size, size, size, size);
+        guiGraphics.flush();
         VOptionList currentList = this.optionPages.get(this.currentListIdx).getOptionList();
         currentList.updateState(mouseX, mouseY);
         currentList.renderWidget(mouseX, mouseY);
-        renderButtons(mouseX, mouseY);
+        this.renderButtons(mouseX, mouseY);
 
-        List<FormattedCharSequence> list = getHoveredButtonTooltip(currentList, mouseX, mouseY);
+        List<FormattedCharSequence> list = this.getHoveredButtonTooltip(currentList, mouseX, mouseY);
         if (list != null) {
             this.renderTooltip(list, this.tooltipX, this.tooltipY);
         }
     }
 
     public void renderButtons(int mouseX, int mouseY) {
-        for (VButtonWidget button : buttons) {
+        for (VButtonWidget button : this.buttons) {
             button.render(mouseX, mouseY);
         }
     }
@@ -274,10 +277,10 @@ public class VOptionScreen extends Screen {
         int color = ColorUtil.ARGB.pack(intensity, intensity, intensity, 0.6f);
         GuiRenderer.fill(x - padding, y - padding, x + width + padding, y + height + padding, color);
 
-//        intensity = 0.4f;
-//        color = ColorUtil.ARGB.pack(intensity, intensity, intensity, 0.9f);
+        // intensity = 0.4f;
+        // color = ColorUtil.ARGB.pack(intensity, intensity, intensity, 0.9f);
         color = RED;
-        GuiRenderer.renderBorder(x - padding, y - padding, x + width + padding, y + height + padding, 1, color);
+        GuiRenderer.renderBorder(x - padding, y - padding, x + width + padding, y + height + padding, 1.0f, color);
 
         int yOffset = 0;
         for (var text : list) {
@@ -290,10 +293,10 @@ public class VOptionScreen extends Screen {
         VAbstractWidget widget = buttonList.getHoveredWidget(mouseX, mouseY);
         if (widget != null) {
             var tooltip = widget.getTooltip();
-            if (tooltip == null)
-                return null;
-
-            return this.font.split(tooltip, this.tooltipWidth);
+            if (tooltip != null) {
+                return this.font.split(tooltip, this.tooltipWidth);
+            }
+            return null;
         }
         return null;
     }

@@ -1,12 +1,14 @@
 package net.vulkanmod.render.chunk.build.renderer;
 
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode;
 import net.fabricmc.fabric.api.renderer.v1.material.RenderMaterial;
 import net.fabricmc.fabric.api.renderer.v1.material.ShadeMode;
 import net.fabricmc.fabric.api.util.TriState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -35,7 +37,7 @@ public class BlockRenderer extends AbstractBlockRenderContext {
     private BuilderResources resources;
     private TerrainBuilder terrainBuilder;
 
-    final boolean backFaceCulling = Initializer.CONFIG.backFaceCulling;
+    final boolean backFaceCulling;
 
     private TerrainRenderType renderType;
 
@@ -44,7 +46,7 @@ public class BlockRenderer extends AbstractBlockRenderContext {
     }
 
     public BlockRenderer(LightPipeline flatLightPipeline, LightPipeline smoothLightPipeline) {
-        super();
+        this.backFaceCulling = Initializer.CONFIG.backFaceCulling;
         this.setupLightPipelines(flatLightPipeline, smoothLightPipeline);
 
         this.random = new SingleThreadedRandomSource(42L);
@@ -54,7 +56,7 @@ public class BlockRenderer extends AbstractBlockRenderContext {
         this.pos = pos;
         this.blockPos = blockPos;
         this.blockState = blockState;
-        this.seed = blockState.getSeed(blockPos);
+        this.random.setSeed(blockState.getSeed(blockPos));
 
         TerrainRenderType renderType = TerrainRenderType.get(ItemBlockRenderTypes.getChunkRenderType(blockState));
         renderType = TerrainRenderType.getRemapped(renderType);
@@ -62,20 +64,24 @@ public class BlockRenderer extends AbstractBlockRenderContext {
         this.terrainBuilder = this.resources.builderPack.builder(renderType);
         this.terrainBuilder.setBlockAttributes(blockState);
 
-        BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(blockState);
+        BlockStateModel model = Minecraft.getInstance().getBlockRenderer().getBlockModel(blockState);
 
         BlockAndTintGetter renderRegion = this.renderRegion;
-        Vec3 offset = blockState.getOffset(renderRegion, blockPos);
+        Vec3 offset = blockState.getOffset(blockPos);
         pos.add((float) offset.x, (float) offset.y, (float) offset.z);
 
-        this.prepareForBlock(blockState, blockPos, model.useAmbientOcclusion());
+        this.prepareForBlock(blockState, blockPos, blockState.getLightEmission() == 0);
 
-        model.emitBlockQuads(renderRegion, blockState, blockPos, this.randomSupplier, this);
+        model.emitQuads(this.getEmitter(), renderRegion, blockPos, blockState, this.random, this::isFaceCulled);
+    }
+
+    @Override
+    protected VertexConsumer getVertexConsumer(RenderType renderType) {
+        return null;
     }
 
     protected void endRenderQuad(MutableQuadViewImpl quad) {
         final RenderMaterial mat = quad.material();
-        final int colorIndex = mat.disableColorIndex() ? -1 : quad.colorIndex();
         final TriState aoMode = mat.ambientOcclusion();
         final boolean ao = this.useAO && (aoMode == TriState.TRUE || (aoMode == TriState.DEFAULT && this.defaultAO));
         final boolean emissive = mat.emissive();
@@ -85,7 +91,7 @@ public class BlockRenderer extends AbstractBlockRenderContext {
 
         LightPipeline lightPipeline = ao ? this.smoothLightPipeline : this.flatLightPipeline;
 
-        colorizeQuad(quad, colorIndex);
+        tintQuad(quad);
         shadeQuad(quad, lightPipeline, emissive, vanillaShade);
         bufferQuad(terrainBuilder, this.pos, quad, this.quadLightData);
     }
@@ -112,7 +118,7 @@ public class BlockRenderer extends AbstractBlockRenderContext {
 
         TerrainBufferBuilder bufferBuilder = terrainBuilder.getBufferBuilder(quadFacing.ordinal());
 
-        Vec3i normal = quad.getFacingDirection().getNormal();
+        Vec3i normal = quad.getFacingDirection().getUnitVec3i();
         int packedNormal = I32_SNorm.packNormal(normal.getX(), normal.getY(), normal.getZ());
 
         float[] brightnessArr = quadLightData.br;
@@ -123,7 +129,7 @@ public class BlockRenderer extends AbstractBlockRenderContext {
 
         bufferBuilder.ensureCapacity();
 
-        for (byte i = 0; i < 4; ++i) {
+        for (byte i = 0; i < 4; i++) {
             final float x = pos.x() + quad.getX(idx);
             final float y = pos.y() + quad.getY(idx);
             final float z = pos.z() + quad.getZ(idx);
@@ -144,4 +150,3 @@ public class BlockRenderer extends AbstractBlockRenderContext {
     }
 
 }
-

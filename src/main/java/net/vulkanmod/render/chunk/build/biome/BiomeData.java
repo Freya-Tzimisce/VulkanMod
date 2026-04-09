@@ -32,9 +32,9 @@ public class BiomeData {
 
     public void getBiomeData(Level level, LevelChunkSection chunkSection, int secX, int secY, int secZ) {
         Biome defaultValue = level.registryAccess()
-                                  .registryOrThrow(Registries.BIOME)
-                                  .getHolderOrThrow(Biomes.PLAINS)
-                                  .value();
+                .lookupOrThrow(Registries.BIOME)
+                .getOrThrow(Biomes.PLAINS)
+                .value();
 
         int baseIdx = getRelativeSectionIdx(secX, secY, secZ);
 
@@ -46,7 +46,7 @@ public class BiomeData {
 
                     if (chunkSection != null) {
                         biomes[idx] = chunkSection.getNoiseBiome(x, y, z)
-                                                  .value();
+                                .value();
                     }
                     else {
                         biomes[idx] = defaultValue;

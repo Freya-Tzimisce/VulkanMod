@@ -18,12 +18,12 @@ package net.vulkanmod.render.chunk.build.frapi.helper;
 
 import static net.minecraft.util.Mth.equal;
 
-import org.joml.Vector3f;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadView;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
+import org.joml.Vector3fc;
 
 /**
  * Static routines of general utility for renderer implementations.
@@ -109,24 +109,24 @@ public abstract class GeometryHelper {
 		int a, b;
 
 		switch (lightFace) {
-		case EAST:
-		case WEST:
-			a = 1;
-			b = 2;
-			break;
-		case UP:
-		case DOWN:
-			a = 0;
-			b = 2;
-			break;
-		case SOUTH:
-		case NORTH:
-			a = 1;
-			b = 0;
-			break;
-		default:
-			// handle WTF case
-			return false;
+			case EAST:
+			case WEST:
+				a = 1;
+				b = 2;
+				break;
+			case UP:
+			case DOWN:
+				a = 0;
+				b = 2;
+				break;
+			case SOUTH:
+			case NORTH:
+				a = 1;
+				b = 0;
+				break;
+			default:
+				// handle WTF case
+				return false;
 		}
 
 		return confirmSquareCorners(a, b, quad);
@@ -178,20 +178,20 @@ public abstract class GeometryHelper {
 	 * <p>Derived from the quad face normal and expects convex quads with all points co-planar.
 	 */
 	public static Direction lightFace(QuadView quad) {
-		final Vector3f normal = quad.faceNormal();
+		final Vector3fc normal = quad.faceNormal();
 		switch (GeometryHelper.longestAxis(normal)) {
-		case X:
-			return normal.x() > 0 ? Direction.EAST : Direction.WEST;
+			case X:
+				return normal.x() > 0 ? Direction.EAST : Direction.WEST;
 
-		case Y:
-			return normal.y() > 0 ? Direction.UP : Direction.DOWN;
+			case Y:
+				return normal.y() > 0 ? Direction.UP : Direction.DOWN;
 
-		case Z:
-			return normal.z() > 0 ? Direction.SOUTH : Direction.NORTH;
+			case Z:
+				return normal.z() > 0 ? Direction.SOUTH : Direction.NORTH;
 
-		default:
-			// handle WTF case
-			return Direction.UP;
+			default:
+				// handle WTF case
+				return Direction.UP;
 		}
 	}
 
@@ -216,7 +216,7 @@ public abstract class GeometryHelper {
 	/**
 	 * @see #longestAxis(float, float, float)
 	 */
-	public static Axis longestAxis(Vector3f vec) {
+	public static Axis longestAxis(Vector3fc vec) {
 		return longestAxis(vec.x(), vec.y(), vec.z());
 	}
 

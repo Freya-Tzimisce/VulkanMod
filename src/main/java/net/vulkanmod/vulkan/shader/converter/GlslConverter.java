@@ -1,24 +1,25 @@
 package net.vulkanmod.vulkan.shader.converter;
 
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.vulkanmod.vulkan.shader.descriptor.ImageDescriptor;
 import net.vulkanmod.vulkan.shader.descriptor.UBO;
 
 import java.util.*;
 
 public class GlslConverter {
-    
+
     ShaderStage shaderStage;
     private State state;
 
     private UniformParser uniformParser;
-    private InputOutputParser inOutParser;
+    private AttributeParser inOutParser;
 
     private String vshConverted;
     private String fshConverted;
 
-    public void process(String vertShader, String fragShader) {
+    public void process(VertexFormat vertexFormat, String vertShader, String fragShader) {
         this.uniformParser = new UniformParser(this);
-        this.inOutParser = new InputOutputParser(this);
+        this.inOutParser = new AttributeParser(this, vertexFormat);
 
         StringBuilder vshOut = this.processShaderFile(ShaderStage.Vertex, vertShader);
         vshOut.insert(0, this.inOutParser.createInOutCode());

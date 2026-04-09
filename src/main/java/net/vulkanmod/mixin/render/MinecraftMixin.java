@@ -5,6 +5,7 @@ import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.main.GameConfig;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.vulkanmod.Initializer;
 import net.vulkanmod.render.texture.SpriteUpdateUtil;
 import net.vulkanmod.vulkan.Renderer;
@@ -24,6 +25,7 @@ import java.util.Optional;
 @Mixin(Minecraft.class)
 public class MinecraftMixin {
 
+    @Shadow public boolean noRender;
     @Shadow @Final public Options options;
 
     @Inject(method = "<init>", at = @At(value = "RETURN"))
@@ -43,7 +45,7 @@ public class MinecraftMixin {
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;tick()V"),
             locals = LocalCapture.CAPTURE_FAILHARD)
-    private void redirectResourceTick(boolean bl, CallbackInfo ci, Runnable runnable, int i, int j) {
+    private void redirectResourceTick(boolean bl, CallbackInfo ci, Runnable runnable, int i, ProfilerFiller profilerFiller, int j) {
         int n = Math.min(10, i) - 1;
         boolean doUpload = j == n;
         SpriteUpdateUtil.setDoUpload(doUpload);
