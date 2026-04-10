@@ -14,8 +14,6 @@ import com.mojang.blaze3d.systems.GpuDevice;
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.textures.TextureFormat;
 import com.mojang.logging.LogUtils;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.ShaderDefines;
 import net.minecraft.resources.ResourceLocation;
 import net.vulkanmod.gl.VkGlTexture;
@@ -36,7 +34,14 @@ import org.lwjgl.vulkan.VK10;
 import org.slf4j.Logger;
 
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -364,7 +369,6 @@ public class VkGpuDevice implements GpuDevice {
 		extPipeline.setPipeline(pipeline);
 	}
 
-	@Environment(EnvType.CLIENT)
 	record ShaderCompilationKey(ResourceLocation id, ShaderType type, ShaderDefines defines) {
 
 		public String toString() {

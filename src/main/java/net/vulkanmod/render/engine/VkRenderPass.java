@@ -6,18 +6,16 @@ import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.ScissorState;
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.SharedConstants;
 import net.vulkanmod.interfaces.shader.ExtendedRenderPipeline;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-@Environment(EnvType.CLIENT)
 public class VkRenderPass implements RenderPass {
 	protected static final int MAX_VERTEX_BUFFERS = 1;
 	public static final boolean VALIDATION = SharedConstants.IS_RUNNING_IN_IDE;

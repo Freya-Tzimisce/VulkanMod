@@ -9,6 +9,7 @@ import java.util.EnumSet;
 import java.util.function.Function;
 
 public enum TerrainRenderType {
+    SKY_BLOCK(0.0f),
     SOLID(0.0f),
     CUTOUT_MIPPED(0.5f),
     CUTOUT(0.1f),
@@ -47,9 +48,10 @@ public enum TerrainRenderType {
 
     public static TerrainRenderType get(String name) {
         return switch (name) {
+            case "sky_block" -> TerrainRenderType.SKY_BLOCK;
             case "solid" -> TerrainRenderType.SOLID;
-            case "cutout" -> TerrainRenderType.CUTOUT;
             case "cutout_mipped" -> TerrainRenderType.CUTOUT_MIPPED;
+            case "cutout" -> TerrainRenderType.CUTOUT;
             case "translucent" -> TerrainRenderType.TRANSLUCENT;
             case "tripwire" -> TerrainRenderType.TRIPWIRE;
             default -> null;
@@ -58,9 +60,10 @@ public enum TerrainRenderType {
 
     public static RenderType getRenderType(TerrainRenderType renderType) {
         return switch (renderType) {
+            case SKY_BLOCK -> RenderType.skyBlock();
             case SOLID -> RenderType.solid();
-            case CUTOUT -> RenderType.cutout();
             case CUTOUT_MIPPED -> RenderType.cutoutMipped();
+            case CUTOUT -> RenderType.cutout();
             case TRANSLUCENT -> RenderType.translucent();
             case TRIPWIRE -> RenderType.tripwire();
         };
@@ -71,12 +74,14 @@ public enum TerrainRenderType {
             remapper = (renderType) -> switch (renderType) {
                 case SOLID, CUTOUT, CUTOUT_MIPPED -> TerrainRenderType.CUTOUT_MIPPED;
                 case TRANSLUCENT, TRIPWIRE -> TerrainRenderType.TRANSLUCENT;
+                case SKY_BLOCK -> TerrainRenderType.SKY_BLOCK;
             };
         } else {
             remapper = (renderType) -> switch (renderType) {
                 case SOLID, CUTOUT_MIPPED -> TerrainRenderType.CUTOUT_MIPPED;
                 case CUTOUT -> TerrainRenderType.CUTOUT;
                 case TRANSLUCENT, TRIPWIRE -> TerrainRenderType.TRANSLUCENT;
+                case SKY_BLOCK -> TerrainRenderType.SKY_BLOCK;
             };
         }
     }

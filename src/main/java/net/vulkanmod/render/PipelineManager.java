@@ -20,9 +20,7 @@ public abstract class PipelineManager {
         terrainVertexFormat = format;
     }
 
-    static GraphicsPipeline
-            terrainShader, terrainShaderEarlyZ,
-            fastBlitPipeline, cloudsPipeline;
+    static GraphicsPipeline terrainShader,/* terrainShaderEarlyZ, */fastBlitPipeline, cloudsPipeline;
 
     private static Function<TerrainRenderType, GraphicsPipeline> shaderGetter;
 
@@ -35,11 +33,11 @@ public abstract class PipelineManager {
 
     public static void setDefaultShader() {
         setShaderGetter(
-                renderType -> renderType == TerrainRenderType.TRANSLUCENT ? terrainShaderEarlyZ : terrainShader);
+                renderType -> /*renderType == TerrainRenderType.TRANSLUCENT ? terrainShaderEarlyZ : */terrainShader);
     }
 
     private static void createBasicPipelines() {
-        terrainShaderEarlyZ = createPipeline("terrain_earlyZ", terrainVertexFormat);
+//        terrainShaderEarlyZ = createPipeline("terrain_earlyZ", terrainVertexFormat);
         terrainShader = createPipeline("terrain", terrainVertexFormat);
         fastBlitPipeline = createPipeline("blit", CustomVertexFormat.NONE);
         cloudsPipeline = createPipeline("clouds", DefaultVertexFormat.POSITION_COLOR);
@@ -68,9 +66,9 @@ public abstract class PipelineManager {
         return terrainShader;
     }
 
-    public static GraphicsPipeline getTerrainIndirectShader(RenderType renderType) {
-        return terrainShaderEarlyZ;
-    }
+//    public static GraphicsPipeline getTerrainIndirectShader(RenderType renderType) {
+//        return terrainShaderEarlyZ;
+//    }
 
     public static GraphicsPipeline getFastBlitPipeline() {
         return fastBlitPipeline;
@@ -81,7 +79,7 @@ public abstract class PipelineManager {
     }
 
     public static void destroyPipelines() {
-        terrainShaderEarlyZ.cleanUp();
+//        terrainShaderEarlyZ.cleanUp();
         terrainShader.cleanUp();
         fastBlitPipeline.cleanUp();
         cloudsPipeline.cleanUp();

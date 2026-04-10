@@ -1,9 +1,10 @@
 {
-    "vertex": "blit_screen",
-    "fragment": "blit_screen",
-    "samplers": [
-        { "name": "Sampler0" }
-    ],
-    "uniforms": [
-    ]
+  "vertex": "blit_screen",
+  "fragment": "blit_screen",
+  "samplers": [
+    {
+      "name": "InSampler"
+    }
+  ],
+  "uniforms": []
 }

@@ -168,12 +168,14 @@ public class BuildTask extends ChunkTask {
             renderType = switch (renderType) {
                 case SOLID, CUTOUT, CUTOUT_MIPPED -> TerrainRenderType.CUTOUT_MIPPED;
                 case TRANSLUCENT, TRIPWIRE -> TerrainRenderType.TRANSLUCENT;
+                case SKY_BLOCK ->  TerrainRenderType.SKY_BLOCK;
             };
         } else {
             renderType = switch (renderType) {
                 case SOLID, CUTOUT_MIPPED -> TerrainRenderType.CUTOUT_MIPPED;
                 case CUTOUT -> TerrainRenderType.CUTOUT;
                 case TRANSLUCENT, TRIPWIRE -> TerrainRenderType.TRANSLUCENT;
+                case SKY_BLOCK ->  TerrainRenderType.SKY_BLOCK;
             };
         }
 

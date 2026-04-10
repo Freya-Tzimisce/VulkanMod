@@ -10,23 +10,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(RenderType.class)
 public class RenderTypeM implements ExtendedRenderType {
-    TerrainRenderType terrainRenderType;
+	TerrainRenderType terrainRenderType;
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void inj(String string, int i, boolean bl, boolean bl2, Runnable runnable, Runnable runnable2,
-                     CallbackInfo ci) {
-        terrainRenderType = switch (string) {
-            case "solid" -> TerrainRenderType.SOLID;
-            case "cutout" -> TerrainRenderType.CUTOUT;
-            case "cutout_mipped" -> TerrainRenderType.CUTOUT_MIPPED;
-            case "translucent" -> TerrainRenderType.TRANSLUCENT;
-            case "tripwire" -> TerrainRenderType.TRIPWIRE;
-            default -> null;
-        };
-    }
+	@Inject(method = "<init>", at = @At("RETURN"))
+	private void inj(String string, int i, boolean bl, boolean bl2, Runnable runnable, Runnable runnable2, CallbackInfo ci) {
+		terrainRenderType = switch (string) {
+			case "sky_block" -> TerrainRenderType.SKY_BLOCK;
+			case "solid" -> TerrainRenderType.SOLID;
+			case "cutout_mipped" -> TerrainRenderType.CUTOUT_MIPPED;
+			case "cutout" -> TerrainRenderType.CUTOUT;
+			case "translucent" -> TerrainRenderType.TRANSLUCENT;
+			case "tripwire" -> TerrainRenderType.TRIPWIRE;
+			default -> null;
+		};
+	}
 
-    @Override
-    public TerrainRenderType getTerrainRenderType() {
-        return terrainRenderType;
-    }
+	@Override
+	public TerrainRenderType getTerrainRenderType() {
+		return terrainRenderType;
+	}
 }

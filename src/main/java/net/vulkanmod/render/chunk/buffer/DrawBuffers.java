@@ -21,7 +21,13 @@ import org.lwjgl.vulkan.VkCommandBuffer;
 import java.nio.ByteBuffer;
 import java.util.EnumMap;
 
-import static org.lwjgl.vulkan.VK10.*;
+import static org.lwjgl.vulkan.VK10.VK_INDEX_TYPE_UINT16;
+import static org.lwjgl.vulkan.VK10.VK_SHADER_STAGE_VERTEX_BIT;
+import static org.lwjgl.vulkan.VK10.nvkCmdBindVertexBuffers;
+import static org.lwjgl.vulkan.VK10.vkCmdBindIndexBuffer;
+import static org.lwjgl.vulkan.VK10.vkCmdDrawIndexed;
+import static org.lwjgl.vulkan.VK10.vkCmdDrawIndexedIndirect;
+import static org.lwjgl.vulkan.VK10.vkCmdPushConstants;
 
 public class DrawBuffers {
     public static final int VERTEX_SIZE = PipelineManager.terrainVertexFormat.getVertexSize();
@@ -119,6 +125,7 @@ public class DrawBuffers {
             case SOLID, CUTOUT -> 100000;
             case CUTOUT_MIPPED -> 250000;
             case TRANSLUCENT, TRIPWIRE -> 60000;
+            case SKY_BLOCK -> 150000;
         };
 
         return this.vertexBuffers.computeIfAbsent(

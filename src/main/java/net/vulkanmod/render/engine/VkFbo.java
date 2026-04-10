@@ -12,29 +12,29 @@ import org.lwjgl.system.MemoryStack;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
 public class VkFbo {
-   final int glId;
-   final VkGpuTexture colorAttachment;
-   final VkGpuTexture depthAttachment;
+	final int glId;
+	final VkGpuTexture colorAttachment;
+	final VkGpuTexture depthAttachment;
 
-   int clear = 0;
-   int clearColor = 0;
-   float clearDepth = 0.0f;
+	int clear = 0;
+	int clearColor = 0;
+	float clearDepth = 0.0f;
 
-   protected VkFbo(VkGpuTexture colorAttachment, VkGpuTexture depthAttachment) {
-      this.glId = GlStateManager.glGenFramebuffers();
-      this.colorAttachment = colorAttachment;
-      this.depthAttachment = depthAttachment;
+	protected VkFbo(VkGpuTexture colorAttachment, VkGpuTexture depthAttachment) {
+		this.glId = GlStateManager.glGenFramebuffers();
+		this.colorAttachment = colorAttachment;
+		this.depthAttachment = depthAttachment;
 
-      // Direct access
-      VkGlFramebuffer fbo = VkGlFramebuffer.getFramebuffer(this.glId);
+		// Direct access
+		VkGlFramebuffer fbo = VkGlFramebuffer.getFramebuffer(this.glId);
 
-      fbo.setAttachmentTexture(GL33.GL_COLOR_ATTACHMENT0, colorAttachment.id);
-      if (depthAttachment != null) {
-         fbo.setAttachmentTexture(GL33.GL_DEPTH_ATTACHMENT, depthAttachment.id);
-      }
-   }
+		fbo.setAttachmentTexture(GL33.GL_COLOR_ATTACHMENT0, colorAttachment.id);
+		if (depthAttachment != null) {
+			fbo.setAttachmentTexture(GL33.GL_DEPTH_ATTACHMENT, depthAttachment.id);
+		}
+	}
 
-   protected void bind() {
+	protected void bind() {
 //        VkGlFramebuffer glFramebuffer = VkGlFramebuffer.getFramebuffer(this.glId);
 //        VkGlFramebuffer.beginRendering(glFramebuffer);
 //
@@ -43,25 +43,25 @@ public class VkFbo {
 //            framebuffer.beginRenderPass(currentCmdBuffer, renderPass, stack);
 //        }
 
-      VkGlFramebuffer.bindFramebuffer(GL33.GL_FRAMEBUFFER, this.glId);
-      clearAttachments();
-   }
+		VkGlFramebuffer.bindFramebuffer(GL33.GL_FRAMEBUFFER, this.glId);
+		clearAttachments();
+	}
 
-   protected void clearAttachments() {
-      if (clear != 0) {
-         VRenderSystem.clearDepth(clearDepth);
-         VRenderSystem.setClearColor(ARGB.redFloat(clearColor), ARGB.greenFloat(clearColor), ARGB.blueFloat(clearColor), ARGB.alphaFloat(clearColor));
-         Renderer.clearAttachments(clear);
+	protected void clearAttachments() {
+		if (clear != 0) {
+			VRenderSystem.clearDepth(clearDepth);
+			VRenderSystem.setClearColor(ARGB.redFloat(clearColor), ARGB.greenFloat(clearColor), ARGB.blueFloat(clearColor), ARGB.alphaFloat(clearColor));
+			Renderer.clearAttachments(clear);
 
-         clear = 0;
-      }
-   }
+			clear = 0;
+		}
+	}
 
-   protected void close() {
-      VkGlFramebuffer.deleteFramebuffer(this.glId);
-   }
+	protected void close() {
+		VkGlFramebuffer.deleteFramebuffer(this.glId);
+	}
 
-   public boolean needsClear() {
-      return this.clear != 0;
-   }
+	public boolean needsClear() {
+		return this.clear != 0;
+	}
 }
