@@ -65,9 +65,8 @@ public abstract class WindowMixin {
     private void vulkanHint(WindowEventHandler windowEventHandler, ScreenManager screenManager, DisplayData displayData, String string, String string2, CallbackInfo ci) {
         GLFW.glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-        //Fix Gnome Client-Side Decorators
-        boolean b = (Platform.isGnome() | Platform.isWeston() | Platform.isGeneric()) && Platform.isWayLand();
-        GLFW.glfwWindowHint(GLFW_DECORATED, (b ? GLFW_FALSE : GLFW_TRUE));
+        //Fix WayLand Client-Side Decorators
+        GLFW.glfwWindowHint(GLFW_DECORATED, (Platform.isWayLand() ? GLFW_FALSE : GLFW_TRUE));
     }
 
     @Inject(method = "<init>", at = @At(value = "RETURN"))

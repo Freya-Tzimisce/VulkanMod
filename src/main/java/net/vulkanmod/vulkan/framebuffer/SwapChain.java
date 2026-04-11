@@ -11,6 +11,7 @@ import net.vulkanmod.vulkan.texture.SamplerManager;
 import net.vulkanmod.vulkan.texture.VulkanImage;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.*;
+import org.slf4j.Logger;
 
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
@@ -31,6 +32,7 @@ import static org.lwjgl.vulkan.VK10.*;
 public class SwapChain extends Framebuffer {
     // Necessary until tearing-control-unstable-v1 is fully implemented on all GPU Drivers for Wayland
     // (As Immediate Mode (and by extension Screen tearing) doesn't exist on some Wayland installations currently)
+    private static final Logger LOGGER = Initializer.getLogger();
     private static final int defUncappedMode = checkPresentMode(VK_PRESENT_MODE_IMMEDIATE_KHR, VK_PRESENT_MODE_MAILBOX_KHR);
 
     private final Long2ReferenceOpenHashMap<long[]> FBO_map = new Long2ReferenceOpenHashMap<>();
@@ -273,7 +275,7 @@ public class SwapChain extends Framebuffer {
             }
         }
 
-        Initializer.LOGGER.warn("Requested mode not supported: " + getDisplayModeString(requestedMode) + ": using FIFO present mode");
+		LOGGER.warn("Requested mode not supported: {}: using FIFO present mode", getDisplayModeString(requestedMode));
         return VK_PRESENT_MODE_FIFO_KHR;
     }
 

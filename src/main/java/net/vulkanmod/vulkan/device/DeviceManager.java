@@ -8,6 +8,7 @@ import net.vulkanmod.vulkan.queue.*;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.vulkan.*;
+import org.slf4j.Logger;
 
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ import static org.lwjgl.vulkan.VK10.*;
 import static org.lwjgl.vulkan.VK12.VK_API_VERSION_1_2;
 
 public abstract class DeviceManager {
+    private static final Logger LOGGER = Initializer.getLogger();
+
     public static List<Device> availableDevices;
     public static List<Device> suitableDevices;
 
@@ -49,7 +52,7 @@ public abstract class DeviceManager {
             DeviceManager.pickPhysicalDevice();
             DeviceManager.createLogicalDevice();
         } catch (Exception e) {
-            Initializer.LOGGER.info(getAvailableDevicesInfo());
+            LOGGER.info(getAvailableDevicesInfo());
             throw new RuntimeException(e);
         }
     }

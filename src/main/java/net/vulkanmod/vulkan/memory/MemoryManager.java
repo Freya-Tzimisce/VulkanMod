@@ -19,6 +19,7 @@ import org.lwjgl.util.vma.VmaAllocationCreateInfo;
 import org.lwjgl.util.vma.VmaBudget;
 import org.lwjgl.vulkan.VkBufferCreateInfo;
 import org.lwjgl.vulkan.VkImageCreateInfo;
+import org.slf4j.Logger;
 
 import java.nio.LongBuffer;
 import java.util.List;
@@ -29,6 +30,7 @@ import static org.lwjgl.util.vma.Vma.*;
 import static org.lwjgl.vulkan.VK10.*;
 
 public class MemoryManager {
+    private static final Logger LOGGER = Initializer.getLogger();
     private static final boolean DEBUG = false;
     public static final long BYTES_IN_MB = 1024 * 1024;
 
@@ -118,9 +120,9 @@ public class MemoryManager {
 
             int result = vmaCreateBuffer(ALLOCATOR, bufferInfo, allocationInfo, pBuffer, pBufferMemory, null);
             if (result != VK_SUCCESS) {
-                Initializer.LOGGER.info(String.format("Failed to create buffer with size: %.3f MB", ((float) size / BYTES_IN_MB)));
-                Initializer.LOGGER.info(String.format("Tracked Device Memory used: %d/%d MB", getAllocatedDeviceMemoryMB(), getDeviceMemoryMB()));
-                Initializer.LOGGER.info(getHeapStats());
+                LOGGER.info(String.format("Failed to create buffer with size: %.3f MB", ((float) size / BYTES_IN_MB)));
+                LOGGER.info("Tracked Device Memory used: {}/{} MB", getAllocatedDeviceMemoryMB(), getDeviceMemoryMB());
+                LOGGER.info(getHeapStats());
 
                 throw new RuntimeException("Failed to create buffer: %s".formatted(VkResult.decode(result)));
             }
@@ -177,7 +179,7 @@ public class MemoryManager {
 
             int result = vmaCreateImage(ALLOCATOR, imageInfo, allocationInfo, pTextureImage, pTextureImageMemory, null);
             if (result != VK_SUCCESS) {
-                Initializer.LOGGER.info(String.format("Failed to create image with size: %dx%d", width, height));
+                LOGGER.info("Failed to create image with size: {}x{}", width, height);
 
                 throw new RuntimeException("Failed to create image: %s".formatted(VkResult.decode(result)));
             }

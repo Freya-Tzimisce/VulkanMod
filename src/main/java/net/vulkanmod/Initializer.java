@@ -7,13 +7,13 @@ import net.vulkanmod.config.Config;
 import net.vulkanmod.config.Platform;
 import net.vulkanmod.config.video.VideoModeManager;
 import net.vulkanmod.render.chunk.build.frapi.VulkanModRenderer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 
 public class Initializer implements ClientModInitializer {
-	public static final Logger LOGGER = LogManager.getLogger("VulkanMod");
+	private static final Logger LOGGER = LoggerFactory.getLogger("VulkanMod");
 
 	private static String VERSION;
 	public static Config CONFIG;
@@ -23,9 +23,10 @@ public class Initializer implements ClientModInitializer {
 
 		VERSION = FabricLoader.getInstance()
 				.getModContainer("vulkanmod")
-				.get()
+				.orElseThrow()
 				.getMetadata()
-				.getVersion().getFriendlyString();
+				.getVersion()
+				.getFriendlyString();
 
 		LOGGER.info("== VulkanMod ==");
 
@@ -50,6 +51,10 @@ public class Initializer implements ClientModInitializer {
 		}
 
 		return config;
+	}
+
+	public static Logger getLogger() {
+		return LOGGER;
 	}
 
 	public static String getVersion() {

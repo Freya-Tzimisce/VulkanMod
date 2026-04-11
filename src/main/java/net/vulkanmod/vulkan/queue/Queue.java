@@ -9,6 +9,7 @@ import org.lwjgl.vulkan.VkDevice;
 import org.lwjgl.vulkan.VkPhysicalDevice;
 import org.lwjgl.vulkan.VkQueue;
 import org.lwjgl.vulkan.VkQueueFamilyProperties;
+import org.slf4j.Logger;
 
 import java.nio.IntBuffer;
 import java.util.stream.IntStream;
@@ -18,6 +19,7 @@ import static org.lwjgl.vulkan.KHRSurface.vkGetPhysicalDeviceSurfaceSupportKHR;
 import static org.lwjgl.vulkan.VK10.*;
 
 public abstract class Queue {
+    private static final Logger LOGGER = Initializer.getLogger();
     private static VkDevice device;
     private static QueueFamilyIndices queueFamilyIndices;
 
@@ -137,7 +139,7 @@ public abstract class Queue {
                 // Use compute queue as fallback
 
                 indices.presentFamily = indices.computeFamily;
-                Initializer.LOGGER.warn("Using compute queue as present fallback");
+                LOGGER.warn("Using compute queue as present fallback");
             }
 
             // In case there's no dedicated transfer queue, we need choose another one

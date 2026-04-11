@@ -12,6 +12,7 @@ import net.vulkanmod.vulkan.shader.descriptor.UBO;
 import net.vulkanmod.vulkan.shader.layout.Uniform;
 import net.vulkanmod.vulkan.util.MappedBuffer;
 import org.lwjgl.system.MemoryUtil;
+import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,6 +30,7 @@ public abstract class RenderPipelineM implements ExtendedRenderPipeline {
 	@Shadow @Final private List<String> samplers;
 	@Unique GraphicsPipeline pipeline;
 	@Unique EGlProgram eGlProgram;
+	@Unique Logger LOGGER = Initializer.getLogger();
 
 	@Shadow public abstract ResourceLocation getVertexShader();
 
@@ -47,7 +49,7 @@ public abstract class RenderPipelineM implements ExtendedRenderPipeline {
 	public Supplier<MappedBuffer> getUniformSupplier(String name) {
 		com.mojang.blaze3d.opengl.Uniform uniform = this.eGlProgram.getUniform(name);
 		if (uniform == null) {
-			Initializer.LOGGER.error(String.format("Error: field %s not present in uniform map", name));
+			LOGGER.error("Error: field {} not present in uniform map", name);
 			return null;
 		} else {
 			ByteBuffer byteBuffer = switch (uniform.getType()) {

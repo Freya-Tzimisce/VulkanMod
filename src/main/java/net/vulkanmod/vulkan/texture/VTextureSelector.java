@@ -7,10 +7,12 @@ import net.vulkanmod.render.engine.VkGpuTexture;
 import net.vulkanmod.vulkan.shader.Pipeline;
 import net.vulkanmod.vulkan.shader.descriptor.ImageDescriptor;
 import org.lwjgl.system.MemoryUtil;
+import org.slf4j.Logger;
 
 import java.nio.ByteBuffer;
 
 public abstract class VTextureSelector {
+    private static final Logger LOGGER = Initializer.getLogger();
     public static final int SIZE = 12;
 
     private static final VulkanImage[] boundTextures = new VulkanImage[SIZE];
@@ -27,7 +29,7 @@ public abstract class VTextureSelector {
 
     public static void bindTexture(int i, VulkanImage texture) {
         if (i < 0 || i >= SIZE) {
-            Initializer.LOGGER.error(String.format("On Texture binding: index %d out of range [0, %d]", i, SIZE - 1));
+            LOGGER.error("On Texture binding: index {} out of range [0, {}]", i, SIZE - 1);
             return;
         }
 
@@ -37,7 +39,7 @@ public abstract class VTextureSelector {
 
     public static void bindImage(int i, VulkanImage texture, int level) {
         if (i < 0 || i > 7) {
-            Initializer.LOGGER.error(String.format("On Texture binding: index %d out of range [0, %d]", i, SIZE - 1));
+            LOGGER.error("On Texture binding: index {} out of range [0, {}]", i, SIZE - 1);
             return;
         }
 
@@ -116,8 +118,7 @@ public abstract class VTextureSelector {
 
     public static void setActiveTexture(int activeTexture) {
         if (activeTexture < 0 || activeTexture >= SIZE) {
-            Initializer.LOGGER.error(
-                    String.format("On Texture binding: index %d out of range [0, %d]", activeTexture, SIZE - 1));
+            LOGGER.error("On Texture binding: index {} out of range [0, {}]", activeTexture, SIZE - 1);
         }
 
         VTextureSelector.activeTexture = activeTexture;

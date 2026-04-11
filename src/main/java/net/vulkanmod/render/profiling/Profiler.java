@@ -5,10 +5,12 @@ import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.vulkanmod.Initializer;
+import org.slf4j.Logger;
 
 import java.util.List;
 
 public class Profiler {
+    private static final Logger LOGGER = Initializer.getLogger();
     private static final boolean DEBUG = false;
     private static final boolean FORCE_ACTIVE = false;
 
@@ -87,7 +89,7 @@ public class Profiler {
 
         if (nodeStack.isEmpty()) {
             if (DEBUG)
-                Initializer.LOGGER.error("Profiler %s: Pop called with no more nodes on the stack".formatted(name));
+                LOGGER.error("Profiler %s: Pop called with no more nodes on the stack".formatted(name));
 
             return;
         }
@@ -108,7 +110,7 @@ public class Profiler {
 
         if (!nodeStack.isEmpty()) {
             if (DEBUG)
-                Initializer.LOGGER.error("Profiler %s: Node stack is not empty".formatted(name));
+                LOGGER.error("Profiler %s: Node stack is not empty".formatted(name));
 
             nodeStack.clear();
             startTimes.clear();
@@ -130,7 +132,7 @@ public class Profiler {
             return;
 
         if (DEBUG && currentNode != mainNode) {
-            Initializer.LOGGER.error("Profiler %s: current node is not the main node".formatted(name));
+            LOGGER.error("Profiler %s: current node is not the main node".formatted(name));
         }
 
         this.pop();

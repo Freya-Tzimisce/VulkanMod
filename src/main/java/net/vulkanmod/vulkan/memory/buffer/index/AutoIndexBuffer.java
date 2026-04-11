@@ -4,12 +4,14 @@ import net.vulkanmod.Initializer;
 import net.vulkanmod.vulkan.memory.buffer.IndexBuffer;
 import net.vulkanmod.vulkan.memory.MemoryTypes;
 import org.lwjgl.system.MemoryUtil;
+import org.slf4j.Logger;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
 public class AutoIndexBuffer {
+    private static final Logger LOGGER = Initializer.getLogger();
     public static final int U16_MAX_VERTEX_COUNT = 65536;
     public static final int QUAD_U16_MAX_INDEX_COUNT = U16_MAX_VERTEX_COUNT * 3 / 2;
 
@@ -60,7 +62,7 @@ public class AutoIndexBuffer {
     public void checkCapacity(int vertexCount) {
         if(vertexCount > this.vertexCount) {
             int newVertexCount = this.vertexCount * 2;
-            Initializer.LOGGER.info("Reallocating AutoIndexBuffer from {} to {}", this.vertexCount, newVertexCount);
+            LOGGER.info("Reallocating AutoIndexBuffer from {} to {}", this.vertexCount, newVertexCount);
 
             this.indexBuffer.scheduleFree();
             createIndexBuffer(newVertexCount);

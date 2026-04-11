@@ -5,13 +5,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.vulkanmod.Initializer;
 import net.vulkanmod.render.PipelineManager;
 import net.vulkanmod.render.chunk.cull.QuadFacing;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.system.MemoryUtil;
+import org.slf4j.Logger;
 
 import java.nio.ByteBuffer;
 
 public class TerrainBuilder {
-    private static final Logger LOGGER = Initializer.LOGGER;
+    private static final Logger LOGGER = Initializer.getLogger();
     private static final MemoryUtil.MemoryAllocator ALLOCATOR = MemoryUtil.getAllocator(false);
 
     protected long indexBufferPtr;

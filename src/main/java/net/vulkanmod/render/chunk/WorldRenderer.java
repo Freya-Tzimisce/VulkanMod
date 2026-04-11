@@ -47,6 +47,7 @@ import net.vulkanmod.vulkan.texture.VTextureSelector;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
+import org.slf4j.Logger;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -55,6 +56,7 @@ import java.util.Set;
 import java.util.SortedSet;
 
 public class WorldRenderer {
+    private static final Logger LOGGER = Initializer.getLogger();
     private static WorldRenderer INSTANCE;
 
     private final Minecraft minecraft;
@@ -217,7 +219,7 @@ public class WorldRenderer {
                 this.graphNeedsUpdate = true;
             }
         } catch (Exception e) {
-            Initializer.LOGGER.error(e.getMessage());
+            LOGGER.error(e.getMessage());
             this.allChanged();
         }
 
