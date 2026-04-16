@@ -168,7 +168,7 @@ public class DrawBuffers {
         long bufferPtr = cmdBufferPtr;
 
         boolean isTranslucent = terrainRenderType == TerrainRenderType.TRANSLUCENT;
-        boolean backFaceCulling = Initializer.CONFIG.backFaceCulling && !isTranslucent;
+        boolean backFaceCulling = Initializer.getConfig().backFaceCulling && !isTranslucent;
 
         int drawCount = 0;
 
@@ -276,7 +276,7 @@ public class DrawBuffers {
 
     public void buildDrawBatchesDirect(Vec3 cameraPos, StaticQueue<RenderSection> queue, TerrainRenderType terrainRenderType) {
         boolean isTranslucent = terrainRenderType == TerrainRenderType.TRANSLUCENT;
-        boolean backFaceCulling = Initializer.CONFIG.backFaceCulling && !isTranslucent;
+        boolean backFaceCulling = Initializer.getConfig().backFaceCulling && !isTranslucent;
 
         VkCommandBuffer commandBuffer = Renderer.getCommandBuffer();
 

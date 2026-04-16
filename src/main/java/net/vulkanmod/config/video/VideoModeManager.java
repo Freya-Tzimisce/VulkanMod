@@ -22,7 +22,7 @@ public abstract class VideoModeManager {
     }
 
     public static void applySelectedVideoMode() {
-        Initializer.CONFIG.videoMode = selectedVideoMode;
+        Initializer.getConfig().videoMode = selectedVideoMode;
     }
 
     public static VideoModeSet[] getVideoResolutions() {

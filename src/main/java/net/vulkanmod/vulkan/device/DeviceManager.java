@@ -101,12 +101,12 @@ public abstract class DeviceManager {
     public static void pickPhysicalDevice() {
         try (MemoryStack stack = stackPush()) {
 
-            int deviceIdx = Initializer.CONFIG.device;
+            int deviceIdx = Initializer.getConfig().device;
             if (deviceIdx >= 0 && deviceIdx < suitableDevices.size())
                 DeviceManager.device = suitableDevices.get(deviceIdx);
             else {
                 DeviceManager.device = autoPickDevice();
-                Initializer.CONFIG.device = -1;
+                Initializer.getConfig().device = -1;
             }
 
             physicalDevice = DeviceManager.device.physicalDevice;

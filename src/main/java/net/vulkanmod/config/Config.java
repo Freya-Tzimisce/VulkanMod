@@ -31,7 +31,7 @@ public class Config {
 
     public void write() {
 
-        if(!Files.exists(CONFIG_PATH.getParent())) {
+        if (!Files.exists(CONFIG_PATH.getParent())) {
             try {
                 Files.createDirectories(CONFIG_PATH);
             } catch (IOException e) {
@@ -53,6 +53,17 @@ public class Config {
             .excludeFieldsWithModifiers(Modifier.PRIVATE)
             .create();
 
+    public static Config init(Path path) {
+        Config config = load(path);
+
+        if (config == null) {
+            config = new Config();
+            config.write();
+        }
+
+        return config;
+    }
+
     public static Config load(Path path) {
         Config config;
         Config.CONFIG_PATH = path;
@@ -60,12 +71,10 @@ public class Config {
         if (Files.exists(path)) {
             try (FileReader fileReader = new FileReader(path.toFile())) {
                 config = GSON.fromJson(fileReader, Config.class);
-            }
-            catch (IOException exception) {
+            } catch (IOException exception) {
                 throw new RuntimeException(exception.getMessage());
             }
-        }
-        else {
+        } else {
             config = null;
         }
 

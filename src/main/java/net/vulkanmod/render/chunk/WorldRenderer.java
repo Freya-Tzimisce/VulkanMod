@@ -238,7 +238,7 @@ public class WorldRenderer {
             this.level.clearTintCaches();
 
             this.renderRegionCache.clear();
-            this.taskDispatcher.createThreads(Initializer.CONFIG.builderThreads);
+            this.taskDispatcher.createThreads(Initializer.getConfig().builderThreads);
 
             this.graphNeedsUpdate = true;
 
@@ -309,7 +309,7 @@ public class WorldRenderer {
         Zone zone = mcProfiler.zone(() -> "render_" + renderType);
 
         boolean isTranslucent = terrainRenderType == TerrainRenderType.TRANSLUCENT;
-        boolean indirectDraw = Initializer.CONFIG.indirectDraw;
+        boolean indirectDraw = Initializer.getConfig().indirectDraw;
         if (!isTranslucent) {
             GlStateManager._disableBlend();
         } else {
@@ -337,7 +337,7 @@ public class WorldRenderer {
         Renderer.getDrawer().bindIndexBuffer(Renderer.getCommandBuffer(), indexBuffer, indexBuffer.indexType.value);
 
         int currentFrame = Renderer.getCurrentFrame();
-        Set<TerrainRenderType> allowedRenderTypes = Initializer.CONFIG.uniqueOpaqueLayer ? TerrainRenderType.COMPACT_RENDER_TYPES : TerrainRenderType.SEMI_COMPACT_RENDER_TYPES;
+        Set<TerrainRenderType> allowedRenderTypes = Initializer.getConfig().uniqueOpaqueLayer ? TerrainRenderType.COMPACT_RENDER_TYPES : TerrainRenderType.SEMI_COMPACT_RENDER_TYPES;
         if (allowedRenderTypes.contains(terrainRenderType)) {
             terrainRenderType.setCutoutUniform();
 

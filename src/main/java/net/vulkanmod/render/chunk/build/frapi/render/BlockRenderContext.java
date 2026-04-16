@@ -32,7 +32,7 @@ public class BlockRenderContext extends AbstractBlockRenderContext {
 		LightPipeline flatLightPipeline = new FlatLightPipeline(this.lightDataCache);
 
 		LightPipeline smoothLightPipeline;
-		if (Initializer.CONFIG.ambientOcclusion == LightMode.SUB_BLOCK) {
+		if (Initializer.getConfig().ambientOcclusion == LightMode.SUB_BLOCK) {
 			smoothLightPipeline = new NewSmoothLightPipeline(lightDataCache);
 		}
 		else {

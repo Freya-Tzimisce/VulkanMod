@@ -49,7 +49,7 @@ public abstract class LightDataAccess {
     final boolean subBlockLighting;
 
     protected LightDataAccess() {
-        this.subBlockLighting = Initializer.CONFIG.ambientOcclusion == LightMode.SUB_BLOCK;
+        this.subBlockLighting = Initializer.getConfig().ambientOcclusion == LightMode.SUB_BLOCK;
     }
 
     public int get(int x, int y, int z, SimpleDirection d1, SimpleDirection d2) {

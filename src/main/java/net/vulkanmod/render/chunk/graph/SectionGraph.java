@@ -162,7 +162,7 @@ public class SectionGraph {
     }
 
     private void updateRenderChunks() {
-        int maxDirectionsChanges = Initializer.CONFIG.advCulling - 1;
+        int maxDirectionsChanges = Initializer.getConfig().advCulling - 1;
 
         while (this.sectionQueue.hasNext()) {
             RenderSection renderSection = this.sectionQueue.poll();

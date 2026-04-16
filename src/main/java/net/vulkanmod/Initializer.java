@@ -10,13 +10,11 @@ import net.vulkanmod.render.chunk.build.frapi.VulkanModRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
-
 public class Initializer implements ClientModInitializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger("VulkanMod");
 
 	private static String VERSION;
-	public static Config CONFIG;
+	private static Config CONFIG;
 
 	@Override
 	public void onInitializeClient() {
@@ -37,20 +35,13 @@ public class Initializer implements ClientModInitializer {
 				.getConfigDir()
 				.resolve("vulkanmod_settings.json");
 
-		CONFIG = loadConfig(configPath);
+		CONFIG = Config.init(configPath);
 
 		Renderer.register(VulkanModRenderer.INSTANCE);
 	}
 
-	private static Config loadConfig(Path path) {
-		Config config = Config.load(path);
-
-		if (config == null) {
-			config = new Config();
-			config.write();
-		}
-
-		return config;
+	public static Config getConfig() {
+		return CONFIG;
 	}
 
 	public static Logger getLogger() {

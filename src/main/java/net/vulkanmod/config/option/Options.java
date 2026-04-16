@@ -1,7 +1,12 @@
 package net.vulkanmod.config.option;
 
 import com.mojang.blaze3d.platform.Window;
-import net.minecraft.client.*;
+import net.minecraft.client.AttackIndicatorStatus;
+import net.minecraft.client.CloudStatus;
+import net.minecraft.client.GraphicsStatus;
+import net.minecraft.client.InactivityFpsLimit;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.PrioritizeChunkUpdates;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ParticleStatus;
 import net.vulkanmod.Initializer;
@@ -20,7 +25,7 @@ import java.util.stream.IntStream;
 
 public abstract class Options {
     public static boolean fullscreenDirty = false;
-    static Config config = Initializer.CONFIG;
+    static Config config = Initializer.getConfig();
     static Minecraft minecraft = Minecraft.getInstance();
     static Window window = minecraft.getWindow();
     static net.minecraft.client.Options minecraftOptions = minecraft.options;

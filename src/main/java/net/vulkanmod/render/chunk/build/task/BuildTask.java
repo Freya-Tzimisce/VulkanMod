@@ -164,7 +164,7 @@ public class BuildTask extends ChunkTask {
     }
 
     private TerrainRenderType compactRenderTypes(TerrainRenderType renderType) {
-        if (Initializer.CONFIG.uniqueOpaqueLayer) {
+        if (Initializer.getConfig().uniqueOpaqueLayer) {
             renderType = switch (renderType) {
                 case SOLID, CUTOUT, CUTOUT_MIPPED -> TerrainRenderType.CUTOUT_MIPPED;
                 case TRANSLUCENT, TRIPWIRE -> TerrainRenderType.TRANSLUCENT;

@@ -46,7 +46,7 @@ public class BlockRenderer extends AbstractBlockRenderContext {
     }
 
     public BlockRenderer(LightPipeline flatLightPipeline, LightPipeline smoothLightPipeline) {
-        this.backFaceCulling = Initializer.CONFIG.backFaceCulling;
+        this.backFaceCulling = Initializer.getConfig().backFaceCulling;
         this.setupLightPipelines(flatLightPipeline, smoothLightPipeline);
 
         this.random = new SingleThreadedRandomSource(42L);

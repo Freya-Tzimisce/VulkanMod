@@ -70,7 +70,7 @@ public enum TerrainRenderType {
     }
 
     public static void updateMapping() {
-        if (Initializer.CONFIG.uniqueOpaqueLayer) {
+        if (Initializer.getConfig().uniqueOpaqueLayer) {
             remapper = (renderType) -> switch (renderType) {
                 case SOLID, CUTOUT, CUTOUT_MIPPED -> TerrainRenderType.CUTOUT_MIPPED;
                 case TRANSLUCENT, TRIPWIRE -> TerrainRenderType.TRANSLUCENT;

@@ -41,7 +41,7 @@ public class EntityRendererM<T extends Entity> {
 
     @Redirect(method = "shouldRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/culling/Frustum;isVisible(Lnet/minecraft/world/phys/AABB;)Z"))
     private boolean isVisible(Frustum frustum, AABB aABB) {
-        if(Initializer.CONFIG.entityCulling) {
+        if(Initializer.getConfig().entityCulling) {
             WorldRenderer worldRenderer = WorldRenderer.getInstance();
 
             Vec3 pos = aABB.getCenter();

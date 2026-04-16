@@ -15,10 +15,10 @@ public class TerrainBufferBuilder implements VertexConsumer {
     private int capacity;
     private int vertexSize;
 
-    protected long bufferPtr;
+	private long bufferPtr;
 
-    protected int nextElementByte;
-    int vertices;
+	private int nextElementByte;
+	private int vertices;
 
 	private long elementPtr;
 
@@ -55,7 +55,7 @@ public class TerrainBufferBuilder implements VertexConsumer {
 
     public void endVertex() {
         this.nextElementByte += this.vertexSize;
-        ++this.vertices;
+        this.vertices++;
     }
 
     public void vertex(float x, float y, float z, int color, float u, float v, int light, int packedNormal) {

@@ -58,7 +58,7 @@ public class LevelRendererM {
      */
     @Overwrite
     private void renderEntity(Entity entity, double d, double e, double f, float partialTicks, PoseStack poseStack, MultiBufferSource multiBufferSource) {
-        if (!Initializer.CONFIG.entityCulling || !this.managed) {
+        if (!Initializer.getConfig().entityCulling || !this.managed) {
             double h = Mth.lerp(partialTicks, entity.xOld, entity.getX());
             double i = Mth.lerp(partialTicks, entity.yOld, entity.getY());
             double j = Mth.lerp(partialTicks, entity.zOld, entity.getZ());
@@ -75,7 +75,7 @@ public class LevelRendererM {
 
     @Inject(method = "renderEntities", at = @At("RETURN"))
     private void renderEntities(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource1, Camera camera, DeltaTracker deltaTracker, List<Entity> entityList, CallbackInfo ci) {
-        if (!Initializer.CONFIG.entityCulling)
+        if (!Initializer.getConfig().entityCulling)
             return;
 
         Vec3 cameraPos = WorldRenderer.getCameraPos();
