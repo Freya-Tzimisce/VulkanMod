@@ -23,19 +23,19 @@ public class VideoModeSet {
     }
 
     public int getRefreshRate() {
-        return this.refreshRates.get(0);
+        return this.refreshRates.getFirst();
     }
 
-    public boolean hasRefreshRate(int r) {
-        return this.refreshRates.contains(r);
+    public boolean hasRefreshRate(int refreshRate) {
+        return this.refreshRates.contains(refreshRate);
     }
 
     public List<Integer> getRefreshRates() {
         return this.refreshRates;
     }
 
-    void addRefreshRate(int rr) {
-        this.refreshRates.add(rr);
+    void addRefreshRate(int refreshRate) {
+        this.refreshRates.add(refreshRate);
     }
 
     public String toString() {
@@ -44,27 +44,29 @@ public class VideoModeSet {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
-        if (o == null || getClass() != o.getClass())
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
+        }
 
         VideoModeSet that = (VideoModeSet) o;
         return width == that.width && height == that.height && bitDepth == that.bitDepth && refreshRates.equals(that.refreshRates);
     }
 
     public VideoMode getVideoMode(int refresh) {
-        int idx = refreshRates.indexOf(refresh);
+        int index = refreshRates.indexOf(refresh);
 
-        if (idx == -1) {
-            idx = 0;
+        if (index == -1) {
+            index = 0;
         }
 
-        return new VideoMode(this.width, this.height, this.bitDepth, this.refreshRates.get(idx));
+        return new VideoMode(this.width, this.height, this.bitDepth, this.refreshRates.get(index));
     }
 
     public VideoMode getVideoMode() {
-        int refreshRate = this.refreshRates.get(this.refreshRates.size() - 1);
+        int refreshRate = this.refreshRates.getLast();
         return new VideoMode(this.width, this.height, this.bitDepth, refreshRate);
     }
 
@@ -83,13 +85,13 @@ public class VideoModeSet {
 
         @Override
         public String toString() {
-            return "VideoMode[" +
-                    "width=" + width + ", " +
-                    "height=" + height + ", " +
-                    "bitDepth=" + bitDepth + ", " +
-                    "refreshRate=" + refreshRate + ']';
+            return "VideoMode["
+                    + "width=" + width + ", "
+                    + "height=" + height + ", "
+                    + "bitDepth=" + bitDepth + ", "
+                    + "refreshRate=" + refreshRate + ']';
         }
 
-        }
+    }
 
 }

@@ -75,8 +75,7 @@ public abstract class GuiElement implements GuiEventListener, NarratableEntry {
     public float getHoverMultiplier(float time) {
         if (this.hovered) {
             return Math.min(((this.hoverTime) / time), 1.0f);
-        }
-        else {
+        } else {
             int delta = (int) (Util.getMillis() - this.hoverStopTime);
             return Math.max(1.0f - (delta / time), 0.0f);
         }

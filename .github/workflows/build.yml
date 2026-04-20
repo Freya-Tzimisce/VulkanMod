@@ -27,7 +27,7 @@ jobs:
       - name: Build
         run: ./gradlew build
 
-      - name: capture build artifacts
+      - name: Capture build artifacts
         uses: actions/upload-artifact@v7
         with:
           name: Artifacts

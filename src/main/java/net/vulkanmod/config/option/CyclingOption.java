@@ -39,23 +39,26 @@ public class CyclingOption<E> extends Option<E> {
     }
 
     public void prevValue() {
-        if(this.index > 0)
+        if (this.index > 0) {
             this.index--;
+        }
         this.updateValue();
     }
 
     public void nextValue() {
-        if(this.index < values.length - 1)
+        if (this.index < values.length - 1) {
             this.index++;
+        }
         this.updateValue();
     }
 
     private void updateValue() {
-        if(this.index >= 0 && this.index < this.values.length) {
+        if (this.index >= 0 && this.index < this.values.length) {
             this.newValue = values[this.index];
 
-            if (onChange != null)
+            if (onChange != null) {
                 onChange.run();
+            }
         }
     }
 
@@ -66,8 +69,9 @@ public class CyclingOption<E> extends Option<E> {
 
     private int findNewValueIndex() {
         for (int i = 0; i < this.values.length; i++) {
-            if (this.values[i].equals(this.newValue))
+            if (this.values[i].equals(this.newValue)) {
                 return i;
+            }
         }
         return -1;
     }

@@ -67,8 +67,9 @@ public abstract class Option<T> {
     public void setNewValue(T t) {
         this.newValue = t;
 
-        if (onChange != null)
+        if (onChange != null) {
             onChange.run();
+        }
     }
 
     public Component getName() {
@@ -84,11 +85,10 @@ public abstract class Option<T> {
     }
 
     public void apply() {
-        if(!isChanged())
-            return;
-
-        onApply.accept(this.newValue);
-        this.value = this.newValue;
+        if (isChanged()) {
+            onApply.accept(this.newValue);
+            this.value = this.newValue;
+        }
     }
 
     public T getNewValue() {

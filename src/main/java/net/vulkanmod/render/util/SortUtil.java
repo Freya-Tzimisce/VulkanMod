@@ -23,12 +23,11 @@ public class SortUtil {
 
             if (Float.compare(distances[supp[mid]], distances[supp[mid - 1]]) <= 0) {
                 System.arraycopy(supp, from, indices, from, len);
-            }
-            else {
+            } else {
                 int i = from;
                 int p = from;
 
-                for(int q = mid; i < to; ++i) {
+                for (int q = mid; i < to; i++) {
                     if (q < to && (p >= mid || Float.compare(distances[supp[q]],  distances[supp[p]]) > 0)) {
                         indices[i] = supp[q++];
                     } else {
@@ -70,32 +69,32 @@ public class SortUtil {
             float mValue = distances[v];
             while(true) {
 
-                while(b < c) {
-                    if(Float.compare(distances[is[b]], mValue) > 0) {
-                        while(b < c) {
-                            if(Float.compare(distances[is[c]], mValue) < 0) {
+                while (b < c) {
+                    if (Float.compare(distances[is[b]], mValue) > 0) {
+                        while (b < c) {
+                            if (Float.compare(distances[is[c]], mValue) < 0) {
                                 swap(is, b, c);
                                 b++;
                                 c--;
                                 break;
-                            }
-                            else {
+                            } else {
                                 c--;
                             }
                         }
-                    }
-                    else {
+                    } else {
                         b++;
                     }
                 }
 
                 swap(is, d, b);
 
-                if(b - a > 1)
+                if (b - a > 1) {
                     quickSort(is, distances, a, b);
+                }
 
-                if(d - b > 1)
+                if (d - b > 1) {
                     quickSort(is, distances, b, d);
+                }
 
                 return;
             }
@@ -130,7 +129,7 @@ public class SortUtil {
     }
 
     public static void swap(int[] x, int a, int b, int n) {
-        for(int i = 0; i < n; ++b, ++i, ++a) {
+        for (int i = 0; i < n; ++b, ++i, ++a) {
             swap(x, a, b);
         }
 

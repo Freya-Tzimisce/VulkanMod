@@ -49,8 +49,9 @@ public abstract class Options {
                     VideoModeManager.selectedVideoMode.refreshRate = value;
                     VideoModeManager.applySelectedVideoMode();
 
-                    if (minecraftOptions.fullscreen().get())
+                    if (minecraftOptions.fullscreen().get()) {
                         fullscreenDirty = true;
+                    }
                 },
                 () -> VideoModeManager.selectedVideoMode.refreshRate)
                 .setTranslator(refreshRate -> Component.nullToEmpty(refreshRate.toString()));
@@ -62,8 +63,9 @@ public abstract class Options {
                     VideoModeManager.selectedVideoMode = value.getVideoMode(RefreshRate.getNewValue());
                     VideoModeManager.applySelectedVideoMode();
 
-                    if (minecraftOptions.fullscreen().get())
+                    if (minecraftOptions.fullscreen().get()) {
                         fullscreenDirty = true;
+                    }
                 },
                 () -> {
                     var selectedVideoMode = VideoModeManager.selectedVideoMode;
@@ -89,9 +91,7 @@ public abstract class Options {
                                 WindowMode.values(),
                                 value -> {
                                     boolean exclusiveFullscreen = value == WindowMode.EXCLUSIVE_FULLSCREEN;
-                                    minecraftOptions.fullscreen()
-                                            .set(exclusiveFullscreen);
-
+                                    minecraftOptions.fullscreen().set(exclusiveFullscreen);
                                     config.windowMode = value.mode;
                                     fullscreenDirty = true;
                                 },
@@ -99,11 +99,9 @@ public abstract class Options {
                                 .setTranslator(value -> Component.translatable(WindowMode.getComponentName(value))),
                         new RangeOption(Component.translatable("options.framerateLimit"),
                                 10, 260, 10,
-                                value -> Component.nullToEmpty(value == 260 ?
-                                        Component.translatable(
-                                                "options.framerateLimit.max")
-                                        .getString() :
-                                        String.valueOf(value)),
+                                value -> Component.nullToEmpty(value == 260
+                                        ? Component.translatable("options.framerateLimit.max").getString()
+                                        : String.valueOf(value)),
                                 value -> {
                                     minecraftOptions.framerateLimit().set(value);
                                     minecraft.getFramerateLimitTracker().setFramerateLimit(value);
@@ -195,10 +193,11 @@ public abstract class Options {
                         new CyclingOption<>(Component.translatable("options.ao"),
                                 new Integer[]{LightMode.FLAT, LightMode.SMOOTH, LightMode.SUB_BLOCK},
                                 (value) -> {
-                                    if (value > LightMode.FLAT)
+                                    if (value > LightMode.FLAT) {
                                         minecraftOptions.ambientOcclusion().set(true);
-                                    else
+                                    } else {
                                         minecraftOptions.ambientOcclusion().set(false);
+                                    }
 
                                     config.ambientOcclusion = value;
 
@@ -299,27 +298,27 @@ public abstract class Options {
                                 },
                                 () -> config.builderThreads)
                                 .setTranslator(value -> {
-                            if (value == 0)
-                                return Component.translatable("vulkanmod.options.builderThreads.auto");
-                            else
-                                return Component.nullToEmpty(String.valueOf(value));
+                                    if (value == 0) {
+                                        return Component.translatable("vulkanmod.options.builderThreads.auto");
+                                    } else {
+                                        return Component.nullToEmpty(String.valueOf(value));
+                                    }
                         }),
                         new RangeOption(Component.translatable("vulkanmod.options.frameQueue"),
                                 2, 5, 1,
                                 value -> {
                                     config.frameQueueSize = value;
                                     Renderer.scheduleSwapChainUpdate();
-                                }, () -> config.frameQueueSize)
+                                },
+                                () -> config.frameQueueSize)
                                 .setTooltip(Component.translatable("vulkanmod.options.frameQueue.tooltip")),
                         new CyclingOption<>(Component.translatable("vulkanmod.options.deviceSelector"),
-                                IntStream.range(-1, DeviceManager.suitableDevices.size()).boxed()
-                                        .toArray(Integer[]::new),
+                                IntStream.range(-1, DeviceManager.suitableDevices.size()).boxed().toArray(Integer[]::new),
                                 value -> config.device = value,
                                 () -> config.device)
                                 .setTranslator(value -> Component.translatable((value == -1)
                                         ? "vulkanmod.options.deviceSelector.auto"
-                                        : DeviceManager.suitableDevices.get(
-                                        value).deviceName)
+                                        : DeviceManager.suitableDevices.get(value).deviceName)
                                 )
                                 .setTooltip(Component.nullToEmpty("%s: %s".formatted(
                                         Component.translatable("vulkanmod.options.deviceSelector.tooltip").getString(),

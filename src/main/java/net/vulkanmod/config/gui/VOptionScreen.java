@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.vulkanmod.Initializer;
+import net.vulkanmod.config.ConfigManager;
 import net.vulkanmod.config.gui.widget.VAbstractWidget;
 import net.vulkanmod.config.gui.widget.VButtonWidget;
 import net.vulkanmod.config.option.OptionPage;
@@ -324,6 +325,6 @@ public class VOptionScreen extends Screen {
             page.applyOptionChanges();
         }
 
-        Initializer.getConfig().write();
+        ConfigManager.save(Initializer.getConfig());
     }
 }

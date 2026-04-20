@@ -68,8 +68,8 @@ public class VFrustum {
         return this.frustum.intersectAab(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    public boolean isVisible(AABB aABB) {
-        return this.cubeInFrustum(aABB.minX, aABB.minY, aABB.minZ, aABB.maxX, aABB.maxY, aABB.maxZ);
+    public boolean isVisible(AABB aabb) {
+        return this.cubeInFrustum(aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ);
     }
 
     private boolean cubeInFrustum(double d, double e, double f, double g, double h, double i) {
