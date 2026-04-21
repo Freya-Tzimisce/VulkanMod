@@ -1,9 +1,9 @@
 package net.vulkanmod.vulkan.texture;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.vulkanmod.Initializer;
 import net.vulkanmod.gl.VkGlTexture;
 import net.vulkanmod.render.engine.VkGpuTexture;
+import net.vulkanmod.util.LogUtil;
 import net.vulkanmod.vulkan.shader.Pipeline;
 import net.vulkanmod.vulkan.shader.descriptor.ImageDescriptor;
 import org.lwjgl.system.MemoryUtil;
@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import java.nio.ByteBuffer;
 
 public abstract class VTextureSelector {
-    private static final Logger LOGGER = Initializer.getLogger();
+    private static final Logger LOGGER = LogUtil.getLogger();
     public static final int SIZE = 12;
 
     private static final VulkanImage[] boundTextures = new VulkanImage[SIZE];

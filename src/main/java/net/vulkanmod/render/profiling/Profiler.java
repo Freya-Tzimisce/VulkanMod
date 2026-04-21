@@ -4,13 +4,13 @@ import it.unimi.dsi.fastutil.longs.LongArrayFIFOQueue;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.vulkanmod.Initializer;
+import net.vulkanmod.util.LogUtil;
 import org.slf4j.Logger;
 
 import java.util.List;
 
 public class Profiler {
-    private static final Logger LOGGER = Initializer.getLogger();
+    private static final Logger LOGGER = LogUtil.getLogger();
     private static final boolean DEBUG = false;
     private static final boolean FORCE_ACTIVE = false;
 

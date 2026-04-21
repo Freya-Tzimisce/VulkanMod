@@ -1,7 +1,7 @@
 package net.vulkanmod.render.chunk.buffer;
 
 import net.minecraft.world.phys.Vec3;
-import net.vulkanmod.Initializer;
+import net.vulkanmod.config.ConfigManager;
 import net.vulkanmod.render.PipelineManager;
 import net.vulkanmod.render.chunk.ChunkAreaManager;
 import net.vulkanmod.render.chunk.RenderSection;
@@ -168,7 +168,7 @@ public class DrawBuffers {
         long bufferPtr = cmdBufferPtr;
 
         boolean isTranslucent = terrainRenderType == TerrainRenderType.TRANSLUCENT;
-        boolean backFaceCulling = Initializer.getConfig().backFaceCulling && !isTranslucent;
+        boolean backFaceCulling = ConfigManager.getConfig().backFaceCulling && !isTranslucent;
 
         int drawCount = 0;
 
@@ -276,7 +276,7 @@ public class DrawBuffers {
 
     public void buildDrawBatchesDirect(Vec3 cameraPos, StaticQueue<RenderSection> queue, TerrainRenderType terrainRenderType) {
         boolean isTranslucent = terrainRenderType == TerrainRenderType.TRANSLUCENT;
-        boolean backFaceCulling = Initializer.getConfig().backFaceCulling && !isTranslucent;
+        boolean backFaceCulling = ConfigManager.getConfig().backFaceCulling && !isTranslucent;
 
         VkCommandBuffer commandBuffer = Renderer.getCommandBuffer();
 

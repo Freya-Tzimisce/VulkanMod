@@ -1,11 +1,11 @@
-package net.vulkanmod.config.gui.widget;
+package net.vulkanmod.gui.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import net.vulkanmod.config.gui.GuiRenderer;
+import net.vulkanmod.gui.GuiRenderer;
 import net.vulkanmod.vulkan.VRenderSystem;
 import net.vulkanmod.vulkan.util.ColorUtil;
 

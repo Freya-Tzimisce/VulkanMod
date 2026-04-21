@@ -1,4 +1,4 @@
-package net.vulkanmod.config.gui;
+package net.vulkanmod.gui;
 
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;

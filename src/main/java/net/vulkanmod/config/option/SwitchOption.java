@@ -1,8 +1,8 @@
 package net.vulkanmod.config.option;
 
 import net.minecraft.network.chat.Component;
-import net.vulkanmod.config.gui.widget.OptionWidget;
-import net.vulkanmod.config.gui.widget.SwitchOptionWidget;
+import net.vulkanmod.gui.widget.OptionWidget;
+import net.vulkanmod.gui.widget.SwitchOptionWidget;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;

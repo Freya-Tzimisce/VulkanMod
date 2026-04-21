@@ -1,7 +1,7 @@
 package net.vulkanmod.config.option;
 
-import net.vulkanmod.config.gui.OptionBlock;
-import net.vulkanmod.config.gui.VOptionList;
+import net.vulkanmod.gui.OptionBlock;
+import net.vulkanmod.gui.VOptionList;
 
 public class OptionPage {
     public final String name;

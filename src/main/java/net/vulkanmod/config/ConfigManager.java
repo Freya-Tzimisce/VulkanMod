@@ -5,16 +5,13 @@ import com.google.gson.GsonBuilder;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ConfigManager {
+	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 	private static Path CONFIG_PATH;
-	private static final Gson GSON = new GsonBuilder()
-			.setPrettyPrinting()
-			.excludeFieldsWithModifiers(Modifier.PRIVATE)
-			.create();
+	private static Config CONFIG;
 
 	public static void save(Config config) {
 
@@ -33,7 +30,7 @@ public class ConfigManager {
 		}
 	}
 
-	public static Config init(Path path) {
+	public static void init(Path path) {
 		var config = load(path);
 
 		if (config == null) {
@@ -41,7 +38,7 @@ public class ConfigManager {
 			save(config);
 		}
 
-		return config;
+		CONFIG = config;
 	}
 
 	public static Config load(Path path) {
@@ -59,5 +56,9 @@ public class ConfigManager {
 		}
 
 		return config;
+	}
+
+	public static Config getConfig() {
+		return CONFIG;
 	}
 }

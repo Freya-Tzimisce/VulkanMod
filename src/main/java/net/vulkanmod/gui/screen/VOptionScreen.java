@@ -1,4 +1,4 @@
-package net.vulkanmod.config.gui;
+package net.vulkanmod.gui.screen;
 
 import com.google.common.collect.Lists;
 import net.minecraft.Util;
@@ -10,10 +10,11 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
-import net.vulkanmod.Initializer;
 import net.vulkanmod.config.ConfigManager;
-import net.vulkanmod.config.gui.widget.VAbstractWidget;
-import net.vulkanmod.config.gui.widget.VButtonWidget;
+import net.vulkanmod.gui.GuiRenderer;
+import net.vulkanmod.gui.VOptionList;
+import net.vulkanmod.gui.widget.VAbstractWidget;
+import net.vulkanmod.gui.widget.VButtonWidget;
 import net.vulkanmod.config.option.OptionPage;
 import net.vulkanmod.config.option.Options;
 import net.vulkanmod.vulkan.VRenderSystem;
@@ -325,6 +326,6 @@ public class VOptionScreen extends Screen {
             page.applyOptionChanges();
         }
 
-        ConfigManager.save(Initializer.getConfig());
+        ConfigManager.save(ConfigManager.getConfig());
     }
 }

@@ -9,14 +9,13 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.util.Mth;
 import net.minecraft.world.TickRateManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
-import net.vulkanmod.Initializer;
+import net.vulkanmod.config.ConfigManager;
 import net.vulkanmod.render.chunk.WorldRenderer;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.*;
@@ -58,7 +57,7 @@ public class LevelRendererM {
      */
     @Overwrite
     private void renderEntity(Entity entity, double d, double e, double f, float partialTicks, PoseStack poseStack, MultiBufferSource multiBufferSource) {
-        if (!Initializer.getConfig().entityCulling || !this.managed) {
+        if (!ConfigManager.getConfig().entityCulling || !this.managed) {
             double h = Mth.lerp(partialTicks, entity.xOld, entity.getX());
             double i = Mth.lerp(partialTicks, entity.yOld, entity.getY());
             double j = Mth.lerp(partialTicks, entity.zOld, entity.getZ());
@@ -75,7 +74,7 @@ public class LevelRendererM {
 
     @Inject(method = "renderEntities", at = @At("RETURN"))
     private void renderEntities(PoseStack poseStack, MultiBufferSource.BufferSource bufferSource1, Camera camera, DeltaTracker deltaTracker, List<Entity> entityList, CallbackInfo ci) {
-        if (!Initializer.getConfig().entityCulling)
+        if (!ConfigManager.getConfig().entityCulling)
             return;
 
         Vec3 cameraPos = WorldRenderer.getCameraPos();

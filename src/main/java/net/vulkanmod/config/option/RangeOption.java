@@ -2,8 +2,8 @@ package net.vulkanmod.config.option;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import net.vulkanmod.config.gui.widget.OptionWidget;
-import net.vulkanmod.config.gui.widget.RangeOptionWidget;
+import net.vulkanmod.gui.widget.OptionWidget;
+import net.vulkanmod.gui.widget.RangeOptionWidget;
 
 import java.util.function.Consumer;
 import java.util.function.Function;

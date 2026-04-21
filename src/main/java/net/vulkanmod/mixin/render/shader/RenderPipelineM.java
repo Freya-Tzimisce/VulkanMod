@@ -3,9 +3,9 @@ package net.vulkanmod.mixin.render.shader;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.resources.ResourceLocation;
-import net.vulkanmod.Initializer;
 import net.vulkanmod.interfaces.shader.ExtendedRenderPipeline;
 import net.vulkanmod.render.engine.EGlProgram;
+import net.vulkanmod.util.LogUtil;
 import net.vulkanmod.vulkan.shader.GraphicsPipeline;
 import net.vulkanmod.vulkan.shader.Pipeline;
 import net.vulkanmod.vulkan.shader.descriptor.UBO;
@@ -30,7 +30,7 @@ public abstract class RenderPipelineM implements ExtendedRenderPipeline {
 	@Shadow @Final private List<String> samplers;
 	@Unique GraphicsPipeline pipeline;
 	@Unique EGlProgram eGlProgram;
-	@Unique Logger LOGGER = Initializer.getLogger();
+	@Unique Logger LOGGER = LogUtil.getLogger();
 
 	@Shadow public abstract ResourceLocation getVertexShader();
 

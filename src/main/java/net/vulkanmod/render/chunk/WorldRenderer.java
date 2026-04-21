@@ -25,17 +25,17 @@ import net.minecraft.util.profiling.Zone;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
-import net.vulkanmod.Initializer;
+import net.vulkanmod.config.ConfigManager;
 import net.vulkanmod.render.PipelineManager;
 import net.vulkanmod.render.chunk.buffer.DrawBuffers;
 import net.vulkanmod.render.chunk.build.RenderRegionBuilder;
 import net.vulkanmod.render.chunk.build.task.ChunkTask;
 import net.vulkanmod.render.chunk.build.task.TaskDispatcher;
 import net.vulkanmod.render.chunk.graph.SectionGraph;
-import net.vulkanmod.render.chunk.util.StaticQueue;
 import net.vulkanmod.render.profiling.BuildTimeProfiler;
 import net.vulkanmod.render.profiling.Profiler;
 import net.vulkanmod.render.vertex.TerrainRenderType;
+import net.vulkanmod.util.LogUtil;
 import net.vulkanmod.vulkan.Renderer;
 import net.vulkanmod.vulkan.VRenderSystem;
 import net.vulkanmod.vulkan.memory.MemoryTypes;
@@ -56,7 +56,7 @@ import java.util.Set;
 import java.util.SortedSet;
 
 public class WorldRenderer {
-    private static final Logger LOGGER = Initializer.getLogger();
+    private static final Logger LOGGER = LogUtil.getLogger();
     private static WorldRenderer INSTANCE;
 
     private final Minecraft minecraft;
@@ -238,7 +238,7 @@ public class WorldRenderer {
             this.level.clearTintCaches();
 
             this.renderRegionCache.clear();
-            this.taskDispatcher.createThreads(Initializer.getConfig().builderThreads);
+            this.taskDispatcher.createThreads(ConfigManager.getConfig().builderThreads);
 
             this.graphNeedsUpdate = true;
 
@@ -309,7 +309,7 @@ public class WorldRenderer {
         Zone zone = mcProfiler.zone(() -> "render_" + renderType);
 
         boolean isTranslucent = terrainRenderType == TerrainRenderType.TRANSLUCENT;
-        boolean indirectDraw = Initializer.getConfig().indirectDraw;
+        boolean indirectDraw = ConfigManager.getConfig().indirectDraw;
         if (!isTranslucent) {
             GlStateManager._disableBlend();
         } else {
@@ -337,7 +337,7 @@ public class WorldRenderer {
         Renderer.getDrawer().bindIndexBuffer(Renderer.getCommandBuffer(), indexBuffer, indexBuffer.indexType.value);
 
         int currentFrame = Renderer.getCurrentFrame();
-        Set<TerrainRenderType> allowedRenderTypes = Initializer.getConfig().uniqueOpaqueLayer ? TerrainRenderType.COMPACT_RENDER_TYPES : TerrainRenderType.SEMI_COMPACT_RENDER_TYPES;
+        Set<TerrainRenderType> allowedRenderTypes = ConfigManager.getConfig().uniqueOpaqueLayer ? TerrainRenderType.COMPACT_RENDER_TYPES : TerrainRenderType.SEMI_COMPACT_RENDER_TYPES;
         if (allowedRenderTypes.contains(terrainRenderType)) {
             terrainRenderType.setCutoutUniform();
 

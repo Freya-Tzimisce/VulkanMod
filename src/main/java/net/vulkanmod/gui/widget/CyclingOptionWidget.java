@@ -1,4 +1,4 @@
-package net.vulkanmod.config.gui.widget;
+package net.vulkanmod.gui.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -10,7 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
-import net.vulkanmod.config.gui.GuiRenderer;
+import net.vulkanmod.gui.GuiRenderer;
 import net.vulkanmod.config.option.CyclingOption;
 import net.vulkanmod.vulkan.VRenderSystem;
 import net.vulkanmod.vulkan.util.ColorUtil;

@@ -15,7 +15,7 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.SingleThreadedRandomSource;
 import net.minecraft.world.phys.Vec3;
-import net.vulkanmod.Initializer;
+import net.vulkanmod.config.ConfigManager;
 import net.vulkanmod.render.chunk.build.frapi.mesh.MutableQuadViewImpl;
 import net.vulkanmod.render.chunk.build.frapi.render.AbstractBlockRenderContext;
 import net.vulkanmod.render.chunk.build.light.LightPipeline;
@@ -46,7 +46,7 @@ public class BlockRenderer extends AbstractBlockRenderContext {
     }
 
     public BlockRenderer(LightPipeline flatLightPipeline, LightPipeline smoothLightPipeline) {
-        this.backFaceCulling = Initializer.getConfig().backFaceCulling;
+        this.backFaceCulling = ConfigManager.getConfig().backFaceCulling;
         this.setupLightPipelines(flatLightPipeline, smoothLightPipeline);
 
         this.random = new SingleThreadedRandomSource(42L);

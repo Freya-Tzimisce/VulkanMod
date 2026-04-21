@@ -1,6 +1,6 @@
 package net.vulkanmod.config;
 
-import net.vulkanmod.Initializer;
+import net.vulkanmod.util.LogUtil;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import oshi.SystemInfo;
@@ -13,7 +13,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_PLATFORM_WIN32;
 import static org.lwjgl.glfw.GLFW.GLFW_PLATFORM_X11;
 
 public abstract class Platform {
-	private static final Logger LOGGER = Initializer.getLogger();
+	private static final Logger LOGGER = LogUtil.getLogger();
 	private static final int GLFW_CURRENT_PLATFORM = getCurrentPlatform();
 
 	public static void init() {
@@ -26,15 +26,13 @@ public abstract class Platform {
 	// Actually detect the current Window Manager
 	private static int getCurrentWindowManager() {
 		// Return Null platform if not on Unix-like (i.e. no X11 or Wayland)
-		String desktopSession = System.getenv("DESKTOP_SESSION");
-		String xdgSessionType = System.getenv("XDG_SESSION_TYPE");
-		if ("wayland".equals(desktopSession) || "wayland".equals(xdgSessionType)) {
-			return GLFW_PLATFORM_WAYLAND; // Wayland
-		} else if ("x11".equals(desktopSession) || "x11".equals(xdgSessionType)) {
-			return GLFW_PLATFORM_X11; // X11
-		} else {
-			return GLFW_ANY_PLATFORM; // Either unknown Platform or Window Manager
-		}
+		var xdgSessionType = System.getenv("XDG_SESSION_TYPE");
+		return switch (xdgSessionType) {
+			case null -> GLFW_ANY_PLATFORM;
+			case "wayland" -> GLFW_PLATFORM_WAYLAND; // Wayland
+			case "x11" -> GLFW_PLATFORM_X11; // X11
+			default -> GLFW_ANY_PLATFORM; // Either unknown Platform or Window Manager
+		};
 	}
 
 	private static int getCurrentPlatform() {
@@ -64,7 +62,7 @@ public abstract class Platform {
 	}
 
 	//Allows platform specific checks to be handled
-	public static boolean isOthers() {
+	public static boolean isUnknown() {
 		return GLFW_CURRENT_PLATFORM == GLFW_ANY_PLATFORM;
 	}
 

@@ -1,6 +1,6 @@
 package net.vulkanmod.render.chunk.build.thread;
 
-import net.vulkanmod.Initializer;
+import net.vulkanmod.config.ConfigManager;
 import net.vulkanmod.render.chunk.RenderSection;
 import net.vulkanmod.render.chunk.build.renderer.BlockRenderer;
 import net.vulkanmod.render.chunk.build.renderer.FluidRenderer;
@@ -32,7 +32,7 @@ public class BuilderResources {
         LightPipeline flatLightPipeline = new FlatLightPipeline(this.lightDataCache);
 
         LightPipeline smoothLightPipeline;
-        if (Initializer.getConfig().ambientOcclusion == LightMode.SUB_BLOCK) {
+        if (ConfigManager.getConfig().ambientOcclusion == LightMode.SUB_BLOCK) {
             smoothLightPipeline = new NewSmoothLightPipeline(lightDataCache);
         }
         else {

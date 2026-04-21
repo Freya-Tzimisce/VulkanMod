@@ -1,12 +1,12 @@
-package net.vulkanmod.config.gui;
+package net.vulkanmod.gui;
 
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.util.Mth;
-import net.vulkanmod.config.gui.widget.OptionWidget;
-import net.vulkanmod.config.gui.widget.VAbstractWidget;
+import net.vulkanmod.gui.widget.OptionWidget;
+import net.vulkanmod.gui.widget.VAbstractWidget;
 import net.vulkanmod.config.option.Option;
 import net.vulkanmod.vulkan.util.ColorUtil;
 import org.jetbrains.annotations.Nullable;

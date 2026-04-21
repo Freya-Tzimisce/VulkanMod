@@ -1,8 +1,8 @@
 package net.vulkanmod.render.chunk.buffer;
 
 import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
-import net.vulkanmod.Initializer;
 import net.vulkanmod.render.chunk.util.Util;
+import net.vulkanmod.util.LogUtil;
 import net.vulkanmod.vulkan.memory.MemoryManager;
 import net.vulkanmod.vulkan.memory.MemoryType;
 import net.vulkanmod.vulkan.memory.MemoryTypes;
@@ -15,7 +15,7 @@ import java.nio.ByteBuffer;
 
 public class AreaBuffer {
     private static final boolean DEBUG = false;
-    private static final Logger LOGGER = Initializer.getLogger();
+    private static final Logger LOGGER = LogUtil.getLogger();
 
     private static final MemoryType MEMORY_TYPE = MemoryTypes.GPU_MEM;
 

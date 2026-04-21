@@ -3,31 +3,32 @@ package net.vulkanmod;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.renderer.v1.Renderer;
 import net.fabricmc.loader.api.FabricLoader;
-import net.vulkanmod.config.Config;
 import net.vulkanmod.config.ConfigManager;
 import net.vulkanmod.config.Platform;
 import net.vulkanmod.config.video.VideoModeManager;
 import net.vulkanmod.render.chunk.build.frapi.VulkanModRenderer;
+import net.vulkanmod.util.LogUtil;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Initializer implements ClientModInitializer {
-	private static final Logger LOGGER = LoggerFactory.getLogger("VulkanMod");
+	private static final Logger LOGGER = LogUtil.getLogger();
+
+	private static final String MOD_ID = "vulkanmod";
+	private static final String MOD_NAME = "VulkanMod";
 
 	private static String VERSION;
-	private static Config CONFIG;
 
 	@Override
 	public void onInitializeClient() {
 
 		VERSION = FabricLoader.getInstance()
-				.getModContainer("vulkanmod")
+				.getModContainer(MOD_ID)
 				.orElseThrow()
 				.getMetadata()
 				.getVersion()
 				.getFriendlyString();
 
-		LOGGER.info("== VulkanMod ==");
+		LOGGER.info("== {} ==", MOD_NAME);
 
 		Platform.init();
 		VideoModeManager.init();
@@ -36,17 +37,9 @@ public class Initializer implements ClientModInitializer {
 				.getConfigDir()
 				.resolve("vulkanmod_settings.json");
 
-		CONFIG = ConfigManager.init(configPath);
+		ConfigManager.init(configPath);
 
 		Renderer.register(VulkanModRenderer.INSTANCE);
-	}
-
-	public static Config getConfig() {
-		return CONFIG;
-	}
-
-	public static Logger getLogger() {
-		return LOGGER;
 	}
 
 	public static String getVersion() {

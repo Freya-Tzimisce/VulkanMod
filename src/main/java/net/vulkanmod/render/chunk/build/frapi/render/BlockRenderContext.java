@@ -13,7 +13,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.vulkanmod.Initializer;
+import net.vulkanmod.config.ConfigManager;
 import net.vulkanmod.render.chunk.build.frapi.mesh.MutableQuadViewImpl;
 import net.vulkanmod.render.chunk.build.light.LightMode;
 import net.vulkanmod.render.chunk.build.light.LightPipeline;
@@ -32,7 +32,7 @@ public class BlockRenderContext extends AbstractBlockRenderContext {
 		LightPipeline flatLightPipeline = new FlatLightPipeline(this.lightDataCache);
 
 		LightPipeline smoothLightPipeline;
-		if (Initializer.getConfig().ambientOcclusion == LightMode.SUB_BLOCK) {
+		if (ConfigManager.getConfig().ambientOcclusion == LightMode.SUB_BLOCK) {
 			smoothLightPipeline = new NewSmoothLightPipeline(lightDataCache);
 		}
 		else {

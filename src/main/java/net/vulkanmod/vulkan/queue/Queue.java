@@ -1,6 +1,6 @@
 package net.vulkanmod.vulkan.queue;
 
-import net.vulkanmod.Initializer;
+import net.vulkanmod.util.LogUtil;
 import net.vulkanmod.vulkan.Vulkan;
 import net.vulkanmod.vulkan.device.DeviceManager;
 import org.lwjgl.PointerBuffer;
@@ -19,7 +19,7 @@ import static org.lwjgl.vulkan.KHRSurface.vkGetPhysicalDeviceSurfaceSupportKHR;
 import static org.lwjgl.vulkan.VK10.*;
 
 public abstract class Queue {
-    private static final Logger LOGGER = Initializer.getLogger();
+    private static final Logger LOGGER = LogUtil.getLogger();
     private static VkDevice device;
     private static QueueFamilyIndices queueFamilyIndices;
 

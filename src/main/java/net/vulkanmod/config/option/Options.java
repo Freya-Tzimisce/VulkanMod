@@ -9,9 +9,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.PrioritizeChunkUpdates;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ParticleStatus;
-import net.vulkanmod.Initializer;
 import net.vulkanmod.config.Config;
-import net.vulkanmod.config.gui.OptionBlock;
+import net.vulkanmod.config.ConfigManager;
+import net.vulkanmod.gui.OptionBlock;
 import net.vulkanmod.config.video.VideoModeManager;
 import net.vulkanmod.config.video.VideoModeSet;
 import net.vulkanmod.config.video.WindowMode;
@@ -25,7 +25,7 @@ import java.util.stream.IntStream;
 
 public abstract class Options {
     public static boolean fullscreenDirty = false;
-    static Config config = Initializer.getConfig();
+    static Config config = ConfigManager.getConfig();
     static Minecraft minecraft = Minecraft.getInstance();
     static Window window = minecraft.getWindow();
     static net.minecraft.client.Options minecraftOptions = minecraft.options;

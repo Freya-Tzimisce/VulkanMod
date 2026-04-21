@@ -1,4 +1,4 @@
-package net.vulkanmod.config.gui.widget;
+package net.vulkanmod.gui.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
@@ -6,7 +6,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import net.vulkanmod.config.gui.GuiRenderer;
+import net.vulkanmod.gui.GuiRenderer;
 import net.vulkanmod.config.option.RangeOption;
 import net.vulkanmod.vulkan.util.ColorUtil;
 import org.lwjgl.glfw.GLFW;

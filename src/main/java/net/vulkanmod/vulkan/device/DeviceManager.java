@@ -1,7 +1,8 @@
 package net.vulkanmod.vulkan.device;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.vulkanmod.Initializer;
+import net.vulkanmod.config.ConfigManager;
+import net.vulkanmod.util.LogUtil;
 import net.vulkanmod.vulkan.VRenderSystem;
 import net.vulkanmod.vulkan.Vulkan;
 import net.vulkanmod.vulkan.queue.*;
@@ -26,7 +27,7 @@ import static org.lwjgl.vulkan.VK10.*;
 import static org.lwjgl.vulkan.VK12.VK_API_VERSION_1_2;
 
 public abstract class DeviceManager {
-    private static final Logger LOGGER = Initializer.getLogger();
+    private static final Logger LOGGER = LogUtil.getLogger();
 
     public static List<Device> availableDevices;
     public static List<Device> suitableDevices;
@@ -101,12 +102,12 @@ public abstract class DeviceManager {
     public static void pickPhysicalDevice() {
         try (MemoryStack stack = stackPush()) {
 
-            int deviceIdx = Initializer.getConfig().device;
+            int deviceIdx = ConfigManager.getConfig().device;
             if (deviceIdx >= 0 && deviceIdx < suitableDevices.size())
                 DeviceManager.device = suitableDevices.get(deviceIdx);
             else {
                 DeviceManager.device = autoPickDevice();
-                Initializer.getConfig().device = -1;
+                ConfigManager.getConfig().device = -1;
             }
 
             physicalDevice = DeviceManager.device.physicalDevice;

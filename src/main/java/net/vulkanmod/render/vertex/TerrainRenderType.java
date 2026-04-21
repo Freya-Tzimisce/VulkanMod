@@ -1,7 +1,7 @@
 package net.vulkanmod.render.vertex;
 
 import net.minecraft.client.renderer.RenderType;
-import net.vulkanmod.Initializer;
+import net.vulkanmod.config.ConfigManager;
 import net.vulkanmod.interfaces.ExtendedRenderType;
 import net.vulkanmod.vulkan.VRenderSystem;
 
@@ -70,7 +70,7 @@ public enum TerrainRenderType {
     }
 
     public static void updateMapping() {
-        if (Initializer.getConfig().uniqueOpaqueLayer) {
+        if (ConfigManager.getConfig().uniqueOpaqueLayer) {
             remapper = (renderType) -> switch (renderType) {
                 case SOLID, CUTOUT, CUTOUT_MIPPED -> TerrainRenderType.CUTOUT_MIPPED;
                 case TRANSLUCENT, TRIPWIRE -> TerrainRenderType.TRANSLUCENT;

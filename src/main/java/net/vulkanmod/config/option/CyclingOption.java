@@ -1,8 +1,8 @@
 package net.vulkanmod.config.option;
 
 import net.minecraft.network.chat.Component;
-import net.vulkanmod.config.gui.widget.CyclingOptionWidget;
-import net.vulkanmod.config.gui.widget.OptionWidget;
+import net.vulkanmod.gui.widget.CyclingOptionWidget;
+import net.vulkanmod.gui.widget.OptionWidget;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.function.Consumer;

@@ -2,16 +2,16 @@ package net.vulkanmod.render.vertex;
 
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.world.level.block.state.BlockState;
-import net.vulkanmod.Initializer;
 import net.vulkanmod.render.PipelineManager;
 import net.vulkanmod.render.chunk.cull.QuadFacing;
+import net.vulkanmod.util.LogUtil;
 import org.lwjgl.system.MemoryUtil;
 import org.slf4j.Logger;
 
 import java.nio.ByteBuffer;
 
 public class TerrainBuilder {
-    private static final Logger LOGGER = Initializer.getLogger();
+    private static final Logger LOGGER = LogUtil.getLogger();
     private static final MemoryUtil.MemoryAllocator ALLOCATOR = MemoryUtil.getAllocator(false);
 
     protected long indexBufferPtr;

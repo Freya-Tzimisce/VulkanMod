@@ -1,12 +1,12 @@
-package net.vulkanmod.config.gui.widget;
+package net.vulkanmod.gui.widget;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import net.vulkanmod.config.gui.GuiElement;
-import net.vulkanmod.config.gui.GuiRenderer;
+import net.vulkanmod.gui.GuiElement;
+import net.vulkanmod.gui.GuiRenderer;
 import net.vulkanmod.vulkan.util.ColorUtil;
 
 public abstract class VAbstractWidget extends GuiElement {

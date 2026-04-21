@@ -1,4 +1,4 @@
-package net.vulkanmod.config.gui;
+package net.vulkanmod.gui;
 
 import net.vulkanmod.config.option.Option;
 

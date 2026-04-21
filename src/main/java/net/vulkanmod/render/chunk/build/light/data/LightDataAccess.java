@@ -7,7 +7,7 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.vulkanmod.Initializer;
+import net.vulkanmod.config.ConfigManager;
 import net.vulkanmod.interfaces.VoxelShapeExtended;
 import net.vulkanmod.render.chunk.build.light.LightMode;
 import net.vulkanmod.render.chunk.util.SimpleDirection;
@@ -49,7 +49,7 @@ public abstract class LightDataAccess {
     final boolean subBlockLighting;
 
     protected LightDataAccess() {
-        this.subBlockLighting = Initializer.getConfig().ambientOcclusion == LightMode.SUB_BLOCK;
+        this.subBlockLighting = ConfigManager.getConfig().ambientOcclusion == LightMode.SUB_BLOCK;
     }
 
     public int get(int x, int y, int z, SimpleDirection d1, SimpleDirection d2) {

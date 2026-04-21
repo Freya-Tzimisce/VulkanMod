@@ -1,4 +1,4 @@
-package net.vulkanmod.config.gui;
+package net.vulkanmod.gui;
 
 import net.minecraft.Util;
 import net.minecraft.client.gui.ComponentPath;
