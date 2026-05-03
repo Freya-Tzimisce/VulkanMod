@@ -5,22 +5,18 @@ import net.minecraft.util.ARGB;
 import net.vulkanmod.gl.VkGlFramebuffer;
 import net.vulkanmod.vulkan.Renderer;
 import net.vulkanmod.vulkan.VRenderSystem;
-import net.vulkanmod.vulkan.framebuffer.Framebuffer;
 import org.lwjgl.opengl.GL33;
-import org.lwjgl.system.MemoryStack;
-
-import static org.lwjgl.system.MemoryStack.stackPush;
 
 public class VkFbo {
 	final int glId;
-	final VkGpuTexture colorAttachment;
-	final VkGpuTexture depthAttachment;
+	final VkTexture colorAttachment;
+	final VkTexture depthAttachment;
 
 	int clear = 0;
 	int clearColor = 0;
 	float clearDepth = 0.0f;
 
-	protected VkFbo(VkGpuTexture colorAttachment, VkGpuTexture depthAttachment) {
+	protected VkFbo(VkTexture colorAttachment, VkTexture depthAttachment) {
 		this.glId = GlStateManager.glGenFramebuffers();
 		this.colorAttachment = colorAttachment;
 		this.depthAttachment = depthAttachment;

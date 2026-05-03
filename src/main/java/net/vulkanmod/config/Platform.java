@@ -49,7 +49,7 @@ public abstract class Platform {
 	private static String getPlatfromString(int platfrom) {
 		return switch (platfrom) {
 			case GLFW_ANY_PLATFORM -> "UNKNOWN";
-			case GLFW_PLATFORM_WIN32 -> "WIN32";
+			case GLFW_PLATFORM_WIN32 -> "WINDOWS";
 			case GLFW_PLATFORM_COCOA -> "MACOS";
 			case GLFW_PLATFORM_WAYLAND -> "WAYLAND";
 			case GLFW_PLATFORM_X11 -> "X11";

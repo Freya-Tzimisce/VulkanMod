@@ -10,7 +10,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.textures.TextureFormat;
 import net.minecraft.client.Screenshot;
-import net.vulkanmod.render.engine.VkGpuTexture;
+import net.vulkanmod.render.engine.VkTexture;
 import net.vulkanmod.vulkan.Renderer;
 import net.vulkanmod.vulkan.util.ColorUtil;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,7 +40,7 @@ public class ScreenshotRecorderM {
             RenderSystem.getDevice().createCommandEncoder().copyTextureToBuffer(gpuTexture, gpuBuffer, 0, () -> {
                 try (GpuBuffer.ReadView readView = commandEncoder.readBuffer(gpuBuffer)) {
                     NativeImage nativeImage = new NativeImage(width, height, false);
-                    VkGpuTexture colorAttachment = (VkGpuTexture)(Object)Renderer.getInstance().getMainPass().getColorAttachment();
+                    VkTexture colorAttachment = (VkTexture)(Object)Renderer.getInstance().getMainPass().getColorAttachment();
                     boolean isBgraFormat = colorAttachment.getVulkanImage().format == 44;
 
                     for (int y = 0; y < height; y++) {

@@ -4,7 +4,7 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.resources.ResourceLocation;
 import net.vulkanmod.interfaces.shader.ExtendedRenderPipeline;
-import net.vulkanmod.render.engine.EGlProgram;
+import net.vulkanmod.render.engine.VkProgram;
 import net.vulkanmod.util.LogUtil;
 import net.vulkanmod.vulkan.shader.GraphicsPipeline;
 import net.vulkanmod.vulkan.shader.Pipeline;
@@ -29,7 +29,7 @@ public abstract class RenderPipelineM implements ExtendedRenderPipeline {
 	@Shadow @Final private List<RenderPipeline.UniformDescription> uniforms;
 	@Shadow @Final private List<String> samplers;
 	@Unique GraphicsPipeline pipeline;
-	@Unique EGlProgram eGlProgram;
+	@Unique VkProgram vkProgram;
 	@Unique Logger LOGGER = LogUtil.getLogger();
 
 	@Shadow public abstract ResourceLocation getVertexShader();
@@ -47,7 +47,7 @@ public abstract class RenderPipelineM implements ExtendedRenderPipeline {
 
 	@Override
 	public Supplier<MappedBuffer> getUniformSupplier(String name) {
-		com.mojang.blaze3d.opengl.Uniform uniform = this.eGlProgram.getUniform(name);
+		com.mojang.blaze3d.opengl.Uniform uniform = this.vkProgram.getUniform(name);
 		if (uniform == null) {
 			LOGGER.error("Error: field {} not present in uniform map", name);
 			return null;
@@ -67,13 +67,13 @@ public abstract class RenderPipelineM implements ExtendedRenderPipeline {
 	}
 
 	@Override
-	public void setProgram(EGlProgram program) {
-		this.eGlProgram = program;
+	public void setProgram(VkProgram program) {
+		this.vkProgram = program;
 	}
 
 	@Override
-	public EGlProgram getProgram() {
-		return this.eGlProgram;
+	public VkProgram getProgram() {
+		return this.vkProgram;
 	}
 
 	@Override

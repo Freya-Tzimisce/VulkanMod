@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
 
 import static org.lwjgl.vulkan.VK10.*;
 
-public abstract class GlUtil {
+public abstract class VkGlUtil {
 
     public static SPIRVUtils.ShaderKind extToShaderKind(String ext) {
         return switch (ext) {

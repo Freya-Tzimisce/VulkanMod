@@ -42,10 +42,10 @@ public abstract class DeviceManager {
 
     public static SurfaceProperties surfaceProperties;
 
-    static GraphicsQueue graphicsQueue;
-    static PresentQueue presentQueue;
-    static TransferQueue transferQueue;
-    static ComputeQueue computeQueue;
+    private static GraphicsQueue graphicsQueue;
+    private static PresentQueue presentQueue;
+    private static TransferQueue transferQueue;
+    private static ComputeQueue computeQueue;
 
     public static void init(VkInstance instance) {
         try {
@@ -102,9 +102,9 @@ public abstract class DeviceManager {
     public static void pickPhysicalDevice() {
         try (MemoryStack stack = stackPush()) {
 
-            int deviceIdx = ConfigManager.getConfig().device;
-            if (deviceIdx >= 0 && deviceIdx < suitableDevices.size())
-                DeviceManager.device = suitableDevices.get(deviceIdx);
+            int deviceIndex = ConfigManager.getConfig().device;
+            if (deviceIndex >= 0 && deviceIndex < suitableDevices.size())
+                DeviceManager.device = suitableDevices.get(deviceIndex);
             else {
                 DeviceManager.device = autoPickDevice();
                 ConfigManager.getConfig().device = -1;
@@ -144,9 +144,9 @@ public abstract class DeviceManager {
 
         if (!flag) {
             if (!integratedGPUs.isEmpty())
-                currentDevice = integratedGPUs.get(0);
+                currentDevice = integratedGPUs.getFirst();
             else if (!otherDevices.isEmpty())
-                currentDevice = otherDevices.get(0);
+                currentDevice = otherDevices.getFirst();
             else {
                 throw new IllegalStateException("Failed to find a suitable GPU");
             }

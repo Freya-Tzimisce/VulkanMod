@@ -34,8 +34,8 @@ public class VkRenderPass implements RenderPass {
 	protected final Set<String> dirtyUniforms = new HashSet<>();
 	protected final Set<String> dirtySamplers = new HashSet<>();
 
-	public VkRenderPass(VkCommandEncoder glCommandEncoder, boolean bl) {
-		this.encoder = glCommandEncoder;
+	public VkRenderPass(VkCommandEncoder vkCommandEncoder, boolean bl) {
+		this.encoder = vkCommandEncoder;
 		this.hasDepthTexture = bl;
 	}
 
@@ -101,7 +101,7 @@ public class VkRenderPass implements RenderPass {
 
 	@Override
 	public void setVertexBuffer(int i, GpuBuffer gpuBuffer) {
-		if (i >= 0 && i < 1) {
+		if (i == 0) {
 			this.vertexBuffers[i] = gpuBuffer;
 		} else {
 			throw new IllegalArgumentException("Vertex buffer slot is out of range: " + i);
@@ -124,7 +124,7 @@ public class VkRenderPass implements RenderPass {
 	}
 
 	@Override
-	public void drawMultipleIndexed(Collection<RenderPass.Draw> collection,@Nullable GpuBuffer gpuBuffer,@Nullable VertexFormat.IndexType indexType) {
+	public void drawMultipleIndexed(Collection<RenderPass.Draw> collection, @Nullable GpuBuffer gpuBuffer, @Nullable VertexFormat.IndexType indexType) {
 		if (this.closed) {
 			throw new IllegalStateException("Can't use a closed render pass");
 		} else {
@@ -150,5 +150,7 @@ public class VkRenderPass implements RenderPass {
 	}
 
 	@Nullable
-	public RenderPipeline getPipeline() { return pipeline; }
+	public RenderPipeline getPipeline() {
+		return pipeline;
+	}
 }

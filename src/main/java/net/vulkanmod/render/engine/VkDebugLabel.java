@@ -1,24 +1,24 @@
 package net.vulkanmod.render.engine;
 
-import com.mojang.blaze3d.opengl.*;
-import com.mojang.logging.LogUtils;
+import com.mojang.blaze3d.opengl.VertexArrayCache;
+import net.vulkanmod.util.LogUtil;
 import org.slf4j.Logger;
 
 import java.util.Set;
 
 public class VkDebugLabel {
-	private static final Logger LOGGER = LogUtils.getLogger();
+	private static final Logger LOGGER = LogUtil.getLogger();
 
-	public void applyLabel(VkGpuBuffer glBuffer) {
+	public void applyLabel(VkBuffer glBuffer) {
 	}
 
-	public void applyLabel(VkGpuTexture glTexture) {
+	public void applyLabel(VkTexture glTexture) {
 	}
 
-	public void applyLabel(GlShaderModule glShaderModule) {
+	public void applyLabel(VkShaderModule vkShaderModule) {
 	}
 
-	public void applyLabel(GlProgram glProgram) {
+	public void applyLabel(VkProgram eglProgram) {
 	}
 
 	public void applyLabel(VertexArrayCache.VertexArray vertexArray) {

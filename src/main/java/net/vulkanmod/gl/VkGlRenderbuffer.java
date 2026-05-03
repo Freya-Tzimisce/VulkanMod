@@ -83,7 +83,7 @@ public class VkGlRenderbuffer {
             return -1;
 
         return switch (pName) {
-            case GL11.GL_TEXTURE_INTERNAL_FORMAT -> GlUtil.getGlFormat(bound.vulkanImage.format);
+            case GL11.GL_TEXTURE_INTERNAL_FORMAT -> VkGlUtil.getGlFormat(bound.vulkanImage.format);
             case GL11.GL_TEXTURE_WIDTH -> bound.vulkanImage.width;
             case GL11.GL_TEXTURE_HEIGHT -> bound.vulkanImage.height;
 
@@ -122,7 +122,7 @@ public class VkGlRenderbuffer {
     }
 
     void allocateIfNeeded(int width, int height, int format) {
-        int vkFormat = GlUtil.vulkanFormat(format);
+        int vkFormat = VkGlUtil.vulkanFormat(format);
 
         needsUpdate |= vulkanImage == null ||
                 vulkanImage.width != width || vulkanImage.height != height ||
@@ -176,7 +176,7 @@ public class VkGlRenderbuffer {
         int height = this.vulkanImage.height;
 
         if (internalFormat == GL11.GL_RGB && vulkanImage.format == VK_FORMAT_R8G8B8A8_UNORM) {
-            ByteBuffer RGBA_buffer = GlUtil.RGBtoRGBA_buffer(pixels);
+            ByteBuffer RGBA_buffer = VkGlUtil.RGBtoRGBA_buffer(pixels);
             this.vulkanImage.uploadSubTextureAsync(0, width, height, 0, 0, 0, 0, 0, RGBA_buffer);
             MemoryUtil.memFree(RGBA_buffer);
         } else

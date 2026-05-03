@@ -1,10 +1,10 @@
 package net.vulkanmod.config;
 
+import com.mojang.blaze3d.platform.VideoMode;
 import net.vulkanmod.config.video.VideoModeManager;
-import net.vulkanmod.config.video.VideoModeSet;
 
 public class Config {
-    public VideoModeSet.VideoMode videoMode = VideoModeManager.getFirstAvailable().getVideoMode();
+    public VideoMode videoMode = VideoModeManager.getFirstAvailable().getVideoMode();
     public int windowMode = 0;
 
     public int advCulling = 2;

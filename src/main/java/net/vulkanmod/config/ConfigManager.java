@@ -2,8 +2,8 @@ package net.vulkanmod.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,7 +15,7 @@ public class ConfigManager {
 
 	public static void save(Config config) {
 
-		if (!Files.exists(CONFIG_PATH)) {
+		if (Files.notExists(CONFIG_PATH)) {
 			try {
 				Files.createFile(CONFIG_PATH);
 			} catch (IOException e) {
@@ -41,13 +41,14 @@ public class ConfigManager {
 		CONFIG = config;
 	}
 
+	@Nullable
 	public static Config load(Path path) {
 		Config config;
 		CONFIG_PATH = path;
 
 		if (Files.exists(path)) {
-			try (var fileReader = new FileReader(path.toFile())) {
-				config = GSON.fromJson(fileReader, Config.class);
+			try (var bufferedReader = Files.newBufferedReader(path)) {
+				config = GSON.fromJson(bufferedReader, Config.class);
 			} catch (IOException e) {
 				throw new RuntimeException(e.getMessage());
 			}

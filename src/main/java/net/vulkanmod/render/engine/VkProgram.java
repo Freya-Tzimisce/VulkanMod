@@ -1,27 +1,34 @@
 package net.vulkanmod.render.engine;
 
 import com.google.common.collect.Sets;
-import com.mojang.blaze3d.opengl.*;
+import com.mojang.blaze3d.opengl.AbstractUniform;
+import com.mojang.blaze3d.opengl.Uniform;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.shaders.UniformType;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.renderer.FogParameters;
-import org.lwjgl.opengl.*;
+import net.vulkanmod.util.LogUtil;
 import org.jetbrains.annotations.Nullable;
-import org.joml.*;
+import org.jetbrains.annotations.VisibleForTesting;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.lwjgl.opengl.GL20;
 import org.slf4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-public class EGlProgram {
-	private static final Logger LOGGER = LogUtils.getLogger();
+public class VkProgram {
+	private static final Logger LOGGER = LogUtil.getLogger();
 	public static Set<String> BUILT_IN_UNIFORMS = Sets.newHashSet(
 			"ModelViewMat",
 			"ProjMat",
@@ -39,7 +46,7 @@ public class EGlProgram {
 			"GameTime",
 			"ModelOffset"
 	);
-	public static EGlProgram INVALID_PROGRAM = new EGlProgram(-1, "invalid");
+	public static VkProgram INVALID_PROGRAM = new VkProgram(-1, "invalid");
 	private static final AbstractUniform DUMMY_UNIFORM = new AbstractUniform();
 	private final List<String> samplers = new ArrayList<>();
 	private final Object2ObjectMap<String, GpuTexture> samplerTextures = new Object2ObjectOpenHashMap<>();
@@ -48,7 +55,6 @@ public class EGlProgram {
 	private final Map<String, Uniform> uniformsByName = new HashMap<>();
 	private final int programId;
 	private final String debugLabel;
-
 	@Nullable
 	public Uniform MODEL_VIEW_MATRIX;
 	@Nullable
@@ -80,28 +86,84 @@ public class EGlProgram {
 	@Nullable
 	public Uniform MODEL_OFFSET;
 
-	public EGlProgram(int i, String string) {
+	public VkProgram(int i, String string) {
 		this.programId = i;
 		this.debugLabel = string;
 	}
 
-	private Uniform createUniform(RenderPipeline.UniformDescription uniformDescription) {
-		return new Uniform(uniformDescription.name(), uniformDescription.type());
-	}
+//	public static VkProgram link(GlShaderModule glShaderModule, GlShaderModule glShaderModule2, VertexFormat vertexFormat, String string) throws ShaderManager.CompilationException {
+//		int i = GlStateManager.glCreateProgram();
+//		if (i <= 0) {
+//			throw new ShaderManager.CompilationException("Could not create shader program (returned program ID " + i + ")");
+//		} else {
+//			int j = 0;
+
+//			for (String string2 : vertexFormat.getElementAttributeNames()) {
+//				GlStateManager._glBindAttribLocation(i, j, string2);
+//				j++;
+//			}
+
+//			GlStateManager.glAttachShader(i, glShaderModule.getShaderId());
+//			GlStateManager.glAttachShader(i, glShaderModule2.getShaderId());
+//			GlStateManager.glLinkProgram(i);
+//			int k = GlStateManager.glGetProgrami(i, 35714);
+//			if (k == 0) {
+//				String string2 = GlStateManager.glGetProgramInfoLog(i, 32768);
+//				throw new ShaderManager.CompilationException(
+//					"Error encountered when linking program containing VS " + glShaderModule.getId() + " and FS " + glShaderModule2.getId() + ". Log output: " + string2
+//				);
+//			} else {
+//				return new VkProgram(i, string);
+//			}
+//		}
+//	}
 
 	public void setupUniforms(List<RenderPipeline.UniformDescription> list, List<String> samplers) {
 		RenderSystem.assertOnRenderThread();
 
 		for (RenderPipeline.UniformDescription uniformDescription : list) {
 			String string = uniformDescription.name();
-			Uniform uniform = this.createUniform(uniformDescription);
-			this.uniforms.add(uniform);
-			this.uniformsByName.put(string, uniform);
+//			int i = Uniform.glGetUniformLocation(this.programId, string);
+//			if (i != -1) {
+				Uniform uniform = this.createUniform(uniformDescription);
+//				uniform.setLocation(i);
+				this.uniforms.add(uniform);
+				this.uniformsByName.put(string, uniform);
+//			}
 		}
 
 		for (String sampler : samplers) {
-			this.samplers.add(sampler);
+//			int j = Uniform.glGetUniformLocation(this.programId, sampler);
+//			if (j == -1) {
+//				LOGGER.warn("{} shader program does not use sampler {} defined in the pipeline. This might be a bug.", this.debugLabel, sampler);
+//			} else {
+				this.samplers.add(sampler);
+//				this.samplerLocations.add(j);
+//			}
 		}
+
+//		int k = GlStateManager.glGetProgrami(this.programId, 35718);
+
+//		try (MemoryStack memoryStack = MemoryStack.stackPush()) {
+//			IntBuffer intBuffer = memoryStack.mallocInt(1);
+//			IntBuffer intBuffer2 = memoryStack.mallocInt(1);
+
+//			for (int l = 0; l < k; l++) {
+//				String string3 = GL20.glGetActiveUniform(this.programId, l, intBuffer, intBuffer2);
+//				UniformType uniformType = getTypeFromGl(intBuffer2.get(0));
+//				if (!this.uniformsByName.containsKey(string3) && !samplers.contains(string3)) {
+//					if (uniformType != null) {
+//						LOGGER.info("Found unknown but potentially supported uniform {} in {}", string3, this.debugLabel);
+//						Uniform uniform2 = new Uniform(string3, uniformType);
+//						uniform2.setLocation(l);
+//						this.uniforms.add(uniform2);
+//						this.uniformsByName.put(string3, uniform2);
+//					} else {
+//						LOGGER.warn("Found unknown and unsupported uniform {} in {}", string3, this.debugLabel);
+//					}
+//				}
+//			}
+//		}
 
 		this.MODEL_VIEW_MATRIX = this.getUniform("ModelViewMat");
 		this.PROJECTION_MATRIX = this.getUniform("ProjMat");
@@ -120,6 +182,31 @@ public class EGlProgram {
 		this.MODEL_OFFSET = this.getUniform("ModelOffset");
 	}
 
+	private Uniform createUniform(RenderPipeline.UniformDescription uniformDescription) {
+		return new Uniform(uniformDescription.name(), uniformDescription.type());
+	}
+
+//	public void close() {
+//		this.uniforms.forEach(Uniform::close);
+//		GlStateManager.glDeleteProgram(this.programId);
+//	}
+
+//	public void clear() {
+//		RenderSystem.assertOnRenderThread();
+//		GlStateManager._glUseProgram(0);
+//		int i = GlStateManager._getActiveTexture();
+
+//		for (int j = 0; j < this.samplerLocations.size(); j++) {
+//			String string = (String)this.samplers.get(j);
+//			if (!this.samplerTextures.containsKey(string)) {
+//				GlStateManager._activeTexture(33984 + j);
+//				GlStateManager._bindTexture(0);
+//			}
+//		}
+
+//		GlStateManager._activeTexture(i);
+//	}
+
 	@Nullable
 	public Uniform getUniform(String string) {
 		RenderSystem.assertOnRenderThread();
@@ -128,7 +215,7 @@ public class EGlProgram {
 
 	public AbstractUniform safeGetUniform(String string) {
 		Uniform uniform = this.getUniform(string);
-		return (AbstractUniform)(uniform == null ? DUMMY_UNIFORM : uniform);
+		return uniform == null ? DUMMY_UNIFORM : uniform;
 	}
 
 	public void bindSampler(String string, @Nullable GpuTexture gpuTexture) {
@@ -204,6 +291,7 @@ public class EGlProgram {
 		}
 	}
 
+	@VisibleForTesting
 	public int getProgramId() {
 		return this.programId;
 	}
@@ -231,8 +319,8 @@ public class EGlProgram {
 	@Nullable
 	private static UniformType getTypeFromGl(int i) {
 		return switch (i) {
-			case GL11.GL_INT -> UniformType.INT;
-			case GL11.GL_FLOAT -> UniformType.FLOAT;
+			case GL20.GL_INT -> UniformType.INT;
+			case GL20.GL_FLOAT -> UniformType.FLOAT;
 			case GL20.GL_FLOAT_VEC2 -> UniformType.VEC2;
 			case GL20.GL_FLOAT_VEC3 -> UniformType.VEC3;
 			case GL20.GL_FLOAT_VEC4 -> UniformType.VEC4;

@@ -2,7 +2,7 @@ package net.vulkanmod.vulkan.texture;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.vulkanmod.gl.VkGlTexture;
-import net.vulkanmod.render.engine.VkGpuTexture;
+import net.vulkanmod.render.engine.VkTexture;
 import net.vulkanmod.util.LogUtil;
 import net.vulkanmod.vulkan.shader.Pipeline;
 import net.vulkanmod.vulkan.shader.descriptor.ImageDescriptor;
@@ -84,7 +84,7 @@ public abstract class VTextureSelector {
         var imageDescriptors = pipeline.getImageDescriptors();
 
         for (ImageDescriptor state : imageDescriptors) {
-            VkGpuTexture gpuTexture = (VkGpuTexture) RenderSystem.getShaderTexture(state.imageIdx);
+            VkTexture gpuTexture = (VkTexture) RenderSystem.getShaderTexture(state.imageIdx);
 
             if (gpuTexture != null) {
                 gpuTexture.flushModeChanges();

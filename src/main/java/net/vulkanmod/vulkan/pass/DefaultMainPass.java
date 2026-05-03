@@ -4,8 +4,8 @@ import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTexture;
 import net.minecraft.client.Minecraft;
-import net.vulkanmod.render.engine.VkGpuDevice;
-import net.vulkanmod.render.engine.VkGpuTexture;
+import net.vulkanmod.render.engine.VkDevice;
+import net.vulkanmod.render.engine.VkTexture;
 import net.vulkanmod.vulkan.Renderer;
 import net.vulkanmod.vulkan.framebuffer.Framebuffer;
 import net.vulkanmod.vulkan.framebuffer.RenderPass;
@@ -141,7 +141,7 @@ public class DefaultMainPass implements MainPass {
     }
 
     private void createSwapChainTextures() {
-        VkGpuDevice device = (VkGpuDevice) RenderSystem.getDevice();
+        VkDevice device = (VkDevice) RenderSystem.getDevice();
 
         SwapChain swapChain = Renderer.getInstance().getSwapChain();
         var swapChainImages = swapChain.getImages();
@@ -149,7 +149,7 @@ public class DefaultMainPass implements MainPass {
         this.colorAttachmentTextures = new GpuTexture[imageCount];
 
         for (int i = 0; i < imageCount; ++i) {
-            VkGpuTexture attachmentTexture = device.gpuTextureFromVulkanImage(swapChainImages.get(i));
+            VkTexture attachmentTexture = device.gpuTextureFromVulkanImage(swapChainImages.get(i));
             this.colorAttachmentTextures[i] = attachmentTexture;
         }
     }

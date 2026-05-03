@@ -14,7 +14,7 @@ import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.FogParameters;
 import net.minecraft.resources.ResourceLocation;
-import net.vulkanmod.render.engine.VkGpuDevice;
+import net.vulkanmod.render.engine.VkDevice;
 import net.vulkanmod.vulkan.Renderer;
 import net.vulkanmod.vulkan.VRenderSystem;
 import org.jetbrains.annotations.Nullable;
@@ -61,7 +61,7 @@ public abstract class RenderSystemMixin {
     @Overwrite(remap = false)
     public static void initRenderer(long l, int i, boolean bl, BiFunction<ResourceLocation, ShaderType, String> biFunction, boolean bl2) {
         renderThread.setPriority(7);
-        DEVICE = new VkGpuDevice(l, i, bl, biFunction, bl2);
+        DEVICE = new VkDevice(l, i, bl, biFunction, bl2);
         VRenderSystem.initRenderer();
 
         try (ByteBufferBuilder byteBufferBuilder = new ByteBufferBuilder(DefaultVertexFormat.POSITION.getVertexSize() * 4)) {

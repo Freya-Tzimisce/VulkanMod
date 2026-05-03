@@ -627,8 +627,9 @@ public abstract class Pipeline {
 
             UBO ubo = builder.buildUBO(binding, type);
 
-            if (binding >= this.nextBinding)
+            if (binding >= this.nextBinding) {
                 this.nextBinding = binding + 1;
+            }
 
             this.UBOs.add(ubo);
         }
@@ -639,8 +640,9 @@ public abstract class Pipeline {
             int stage = getStageFromString(GsonHelper.getAsString(jsonobject, "type"));
             int size = GsonHelper.getAsInt(jsonobject, "size");
 
-            if (binding >= this.nextBinding)
+            if (binding >= this.nextBinding) {
                 this.nextBinding = binding + 1;
+            }
 
             this.manualUBO = new ManualUBO(binding, stage, size);
         }

@@ -14,9 +14,9 @@ import net.minecraft.client.renderer.PostPass;
 import net.minecraft.client.renderer.PostChainConfig;
 import net.minecraft.resources.ResourceLocation;
 import net.vulkanmod.render.engine.VkCommandEncoder;
-import net.vulkanmod.render.engine.VkGpuBuffer;
-import net.vulkanmod.render.engine.VkGpuDevice;
-import net.vulkanmod.render.engine.VkGpuTexture;
+import net.vulkanmod.render.engine.VkBuffer;
+import net.vulkanmod.render.engine.VkDevice;
+import net.vulkanmod.render.engine.VkTexture;
 import net.vulkanmod.render.engine.VkRenderPass;
 import net.vulkanmod.vulkan.Renderer;
 import org.jetbrains.annotations.Nullable;
@@ -63,9 +63,9 @@ public abstract class PostPassM {
                         RenderTarget renderTarget = resourceHandle.get();
                         RenderSystem.backupProjectionMatrix();
                         RenderSystem.setProjectionMatrix(matrix4f, ProjectionType.ORTHOGRAPHIC);
-                        VkGpuBuffer quadVertexBuffer = (VkGpuBuffer)RenderSystem.getQuadVertexBuffer();
+                        VkBuffer quadVertexBuffer = (VkBuffer)RenderSystem.getQuadVertexBuffer();
                         RenderSystem.AutoStorageIndexBuffer autoStorageIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
-                        VkGpuBuffer indexBuffer = (VkGpuBuffer)autoStorageIndexBuffer.getBuffer(6);
+                        VkBuffer indexBuffer = (VkBuffer)autoStorageIndexBuffer.getBuffer(6);
                         Renderer.getInstance().endRenderPass();
 
                         for (PostPass.Input inputx : this.inputs) {
@@ -73,9 +73,9 @@ public abstract class PostPassM {
                                 ResourceLocation targetId = ((PostPass.TargetInput)inputx).targetId();
                                 RenderTarget inTarget = map.get(targetId).get();
                                 if (inTarget instanceof MainTarget) {
-                                    VkGpuTexture colorTexture = (VkGpuTexture)inTarget.getColorTexture();
+                                    VkTexture colorTexture = (VkTexture)inTarget.getColorTexture();
                                     colorTexture.getVulkanImage().readOnlyLayout();
-                                    VkGpuTexture depthTexture = (VkGpuTexture)inTarget.getDepthTexture();
+                                    VkTexture depthTexture = (VkTexture)inTarget.getDepthTexture();
                                     if (depthTexture != null) {
                                         depthTexture.getVulkanImage().readOnlyLayout();
                                     }
@@ -108,7 +108,7 @@ public abstract class PostPassM {
                                 uniform.setOnRenderPass(renderPass);
                             }
 
-                            VkGpuDevice gpuDevice = (VkGpuDevice)RenderSystem.getDevice();
+                            VkDevice gpuDevice = (VkDevice)RenderSystem.getDevice();
                             VkCommandEncoder commandEncoder = (VkCommandEncoder)gpuDevice.createCommandEncoder();
                             commandEncoder.setupUniforms((VkRenderPass)renderPass);
                             commandEncoder.bindPipeline(((VkRenderPass)renderPass).getPipeline());

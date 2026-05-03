@@ -16,7 +16,7 @@ import net.vulkanmod.gui.VOptionList;
 import net.vulkanmod.gui.widget.VAbstractWidget;
 import net.vulkanmod.gui.widget.VButtonWidget;
 import net.vulkanmod.config.option.OptionPage;
-import net.vulkanmod.config.option.Options;
+import net.vulkanmod.config.option.VOptions;
 import net.vulkanmod.vulkan.VRenderSystem;
 import net.vulkanmod.vulkan.util.ColorUtil;
 
@@ -57,25 +57,25 @@ public class VOptionScreen extends Screen {
 
         OptionPage page = new OptionPage(
                 Component.translatable("vulkanmod.options.pages.video").getString(),
-                Options.getVideoOpts()
+                VOptions.getVideoOpts()
         );
         this.optionPages.add(page);
 
         page = new OptionPage(
                 Component.translatable("vulkanmod.options.pages.graphics").getString(),
-                Options.getGraphicsOpts()
+                VOptions.getGraphicsOpts()
         );
         this.optionPages.add(page);
 
         page = new OptionPage(
                 Component.translatable("vulkanmod.options.pages.optimizations").getString(),
-                Options.getOptimizationOpts()
+                VOptions.getOptimizationOpts()
         );
         this.optionPages.add(page);
 
         page = new OptionPage(
                 Component.translatable("vulkanmod.options.pages.other").getString(),
-                Options.getOtherOpts()
+                VOptions.getOtherOpts()
         );
         this.optionPages.add(page);
     }

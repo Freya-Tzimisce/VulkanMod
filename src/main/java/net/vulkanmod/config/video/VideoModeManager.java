@@ -1,96 +1,93 @@
 package net.vulkanmod.config.video;
 
-import net.vulkanmod.config.ConfigManager;
+import com.mojang.blaze3d.platform.VideoMode;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.glfw.GLFWVidMode;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class VideoModeManager {
-    private static VideoModeSet.VideoMode osVideoMode;
-    private static VideoModeSet[] videoModeSets;
+	private static VideoMode osVideoMode;
+	private static VideoModeSet[] videoModeSets;
 
-    public static VideoModeSet.VideoMode selectedVideoMode;
+//	public static VideoMode selectedVideoMode;
 
-    public static void init() {
-        long monitor = GLFW.glfwGetPrimaryMonitor();
-        osVideoMode = getCurrentVideoMode(monitor);
-        videoModeSets = populateVideoResolutions(monitor);
-    }
+	public static void init() {
+		long monitor = GLFW.glfwGetPrimaryMonitor();
+		osVideoMode = getCurrentVideoMode(monitor);
+		videoModeSets = populateVideoResolutions(monitor);
+	}
 
-    public static void applySelectedVideoMode() {
-        ConfigManager.getConfig().videoMode = selectedVideoMode;
-    }
+//	public static void applySelectedVideoMode() {
+//		ConfigManager.getConfig().videoMode = selectedVideoMode;
+//	}
 
-    public static VideoModeSet[] getVideoResolutions() {
-        return videoModeSets;
-    }
+//	public static VideoModeSet[] getVideoResolutions() {
+//		return videoModeSets;
+//	}
 
-    public static VideoModeSet getFirstAvailable() {
-        if (videoModeSets != null) {
-            return videoModeSets[videoModeSets.length - 1];
-        } else {
-            return VideoModeSet.getDummy();
-        }
-    }
+	public static VideoModeSet getFirstAvailable() {
+		return videoModeSets[videoModeSets.length - 1];
+	}
 
-    public static VideoModeSet.VideoMode getOsVideoMode() {
-        return osVideoMode;
-    }
+	public static VideoMode getOsVideoMode() {
+		return osVideoMode;
+	}
 
-    public static VideoModeSet.VideoMode getCurrentVideoMode(long monitor){
-        GLFWVidMode vidMode = GLFW.glfwGetVideoMode(monitor);
+	public static VideoMode getCurrentVideoMode(long monitor){
+		var vidMode = GLFW.glfwGetVideoMode(monitor);
 
-        if (vidMode == null) {
-            throw new NullPointerException("Unable to get current video mode");
-        }
+		if (vidMode == null) {
+			throw new NullPointerException("Unable to get current video mode");
+		}
 
-        return new VideoModeSet.VideoMode(vidMode.width(), vidMode.height(), vidMode.redBits(), vidMode.refreshRate());
-    }
+		return new VideoMode(vidMode.width(), vidMode.height(), vidMode.redBits(), vidMode.greenBits(), vidMode.blueBits(), vidMode.refreshRate());
+	}
 
-    public static VideoModeSet[] populateVideoResolutions(long monitor) {
-        var buffer = GLFW.glfwGetVideoModes(monitor);
+	public static VideoModeSet[] populateVideoResolutions(long monitor) {
+		var buffer = GLFW.glfwGetVideoModes(monitor);
 
-        List<VideoModeSet> videoModeSets = new ArrayList<>();
+		List<VideoModeSet> videoModeSets = new ArrayList<>();
 
-        int currWidth = 0, currHeight = 0, currBitDepth = 0;
-        VideoModeSet videoModeSet = null;
+		int widthx = 0, heightx = 0, redBitsx = 0, greenBitsx = 0, blueBitsx = 0;
+		VideoModeSet videoModeSet = null;
 
-        for (int i = 0; i < buffer.limit(); i++) {
-            buffer.position(i);
-            int bitDepth = buffer.redBits();
-            if (buffer.redBits() >= 8 && buffer.greenBits() == bitDepth && buffer.blueBits() == bitDepth) {
-                int width = buffer.width();
-                int height = buffer.height();
-                int refreshRate = buffer.refreshRate();
+		for (int i = 0; i < buffer.limit(); i++) {
+			buffer.position(i);
+			int width = buffer.width();
+			int height = buffer.height();
+			int redBits = buffer.redBits();
+			int greenBits = buffer.greenBits();
+			int blueBits = buffer.blueBits();
+			int refreshRate = buffer.refreshRate();
 
-                if (currWidth != width || currHeight != height || currBitDepth != bitDepth) {
-                    currWidth = width;
-                    currHeight = height;
-                    currBitDepth = bitDepth;
+			if (widthx != width || heightx != height || redBitsx != redBits || greenBitsx != greenBits || blueBitsx != blueBits) {
+				widthx = width;
+				heightx = height;
+				redBitsx = redBits;
+				greenBitsx = greenBits;
+				blueBitsx = blueBits;
 
-                    videoModeSet = new VideoModeSet(currWidth, currHeight, currBitDepth);
-                    videoModeSets.add(videoModeSet);
-                }
+				videoModeSet = new VideoModeSet(widthx, heightx, redBitsx, greenBitsx, blueBitsx);
+				videoModeSets.add(videoModeSet);
+			}
 
-                videoModeSet.addRefreshRate(refreshRate);
-            }
-        }
+			videoModeSet.addRefreshRate(refreshRate);
+		}
 
-        VideoModeSet[] arr = new VideoModeSet[videoModeSets.size()];
-        videoModeSets.toArray(arr);
+		VideoModeSet[] arr = new VideoModeSet[videoModeSets.size()];
+		videoModeSets.toArray(arr);
 
-        return arr;
-    }
+		return arr;
+	}
 
-    public static VideoModeSet getFromVideoMode(VideoModeSet.VideoMode videoMode) {
-        for (var set : videoModeSets) {
-            if (set.width == videoMode.width && set.height == videoMode.height) {
-                return set;
-            }
-        }
+	public static VideoModeSet getFromVideoMode(VideoMode videoMode) {
+		for (var set : videoModeSets) {
+			if (set.width == videoMode.getWidth() && set.height == videoMode.getHeight()) {
+				return set;
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 }

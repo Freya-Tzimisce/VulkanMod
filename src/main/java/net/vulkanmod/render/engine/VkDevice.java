@@ -4,7 +4,10 @@ import com.google.gson.JsonObject;
 import com.mojang.blaze3d.buffers.BufferType;
 import com.mojang.blaze3d.buffers.BufferUsage;
 import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.opengl.*;
+import com.mojang.blaze3d.opengl.GlConst;
+import com.mojang.blaze3d.opengl.GlProgram;
+import com.mojang.blaze3d.opengl.GlRenderPipeline;
+import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.pipeline.CompiledRenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.preprocessor.GlslPreprocessor;
@@ -13,12 +16,12 @@ import com.mojang.blaze3d.systems.CommandEncoder;
 import com.mojang.blaze3d.systems.GpuDevice;
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.textures.TextureFormat;
-import com.mojang.logging.LogUtils;
 import net.minecraft.client.renderer.ShaderDefines;
 import net.minecraft.resources.ResourceLocation;
 import net.vulkanmod.gl.VkGlTexture;
 import net.vulkanmod.interfaces.shader.ExtendedRenderPipeline;
 import net.vulkanmod.render.shader.ShaderLoadUtil;
+import net.vulkanmod.util.LogUtil;
 import net.vulkanmod.vulkan.Vulkan;
 import net.vulkanmod.vulkan.shader.GraphicsPipeline;
 import net.vulkanmod.vulkan.shader.Pipeline;
@@ -29,7 +32,8 @@ import net.vulkanmod.vulkan.texture.VulkanImage;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.*;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
 import org.lwjgl.vulkan.VK10;
 import org.slf4j.Logger;
 
@@ -45,20 +49,24 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-public class VkGpuDevice implements GpuDevice {
-	private static final Logger LOGGER = LogUtils.getLogger();
-
+public class VkDevice implements GpuDevice {
+	private static final Logger LOGGER = LogUtil.getLogger();
+	protected static boolean USE_GL_ARB_vertex_attrib_binding = true;
+	protected static boolean USE_GL_KHR_debug = true;
+	protected static boolean USE_GL_EXT_debug_label = true;
+	protected static boolean USE_GL_ARB_debug_output = true;
+	protected static boolean USE_GL_ARB_direct_state_access = true;
 	private final VkCommandEncoder encoder;
 	private final VkDebugLabel debugLabels;
 	private final int maxSupportedTextureSize;
 	private final BiFunction<ResourceLocation, ShaderType, String> defaultShaderSource;
 	private final Map<RenderPipeline, GlRenderPipeline> pipelineCache = new IdentityHashMap<>();
-	private final Map<ShaderCompilationKey, GlShaderModule> shaderCache = new HashMap<>();
+	private final Map<ShaderCompilationKey, VkShaderModule> shaderCache = new HashMap<>();
 	private final Set<String> enabledExtensions = new HashSet<>();
 
 	private final Map<ShaderCompilationKey, String> shaderSrcCache = new HashMap<>();
 
-	public VkGpuDevice(long l, int i, boolean bl, BiFunction<ResourceLocation, ShaderType, String> shaderSource, boolean bl2) {
+	public VkDevice(long l, int i, boolean bl, BiFunction<ResourceLocation, ShaderType, String> shaderSource, boolean bl2) {
 		this.debugLabels = VkDebugLabel.create(bl2, this.enabledExtensions);
 		this.maxSupportedTextureSize = 8192;
 		this.defaultShaderSource = shaderSource;
@@ -90,7 +98,7 @@ public class VkGpuDevice implements GpuDevice {
 				string = String.valueOf(id);
 			}
 
-			int format = VkGpuTexture.vkFormat(textureFormat);
+			int format = VkConst.toVkId(textureFormat);
 			boolean depthFormat = VulkanImage.isDepthFormat(format);
 			int attachmentUsage = depthFormat ? VK10.VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT : VK10.VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
@@ -105,18 +113,18 @@ public class VkGpuDevice implements GpuDevice {
 			vGlTexture.setVulkanImage(texture);
 			VkGlTexture.bindTexture(id);
 
-			VkGpuTexture glTexture = new VkGpuTexture(string, textureFormat, width, height, mipLevels, id, vGlTexture);
+			VkTexture glTexture = new VkTexture(string, textureFormat, width, height, mipLevels, id, vGlTexture);
 			this.debugLabels.applyLabel(glTexture);
 			return glTexture;
 		}
 	}
 
-	public VkGpuTexture gpuTextureFromVulkanImage(VulkanImage image) {
+	public VkTexture gpuTextureFromVulkanImage(VulkanImage image) {
 		int id = VkGlTexture.genTextureId();
 		VkGlTexture glTexture = VkGlTexture.getTexture(id);
 		glTexture.setVulkanImage(image);
-		TextureFormat textureFormat = VkGpuTexture.textureFormat(image.format);
-		VkGpuTexture gpuTexture = new VkGpuTexture(image.name, textureFormat, image.width, image.height, image.mipLevels, id, glTexture);
+		TextureFormat textureFormat = VkTexture.textureFormat(image.format);
+		VkTexture gpuTexture = new VkTexture(image.name, textureFormat, image.width, image.height, image.mipLevels, id, glTexture);
 		this.debugLabels.applyLabel(gpuTexture);
 		return gpuTexture;
 	}
@@ -126,7 +134,7 @@ public class VkGpuDevice implements GpuDevice {
 		if (size <= 0) {
 			throw new IllegalArgumentException("Buffer size must be greater than zero");
 		} else {
-			return new VkGpuBuffer(this.debugLabels, supplier, bufferType, bufferUsage, size);
+			return new VkBuffer(this.debugLabels, supplier, bufferType, bufferUsage, size);
 		}
 	}
 
@@ -135,7 +143,7 @@ public class VkGpuDevice implements GpuDevice {
 		if (!byteBuffer.hasRemaining()) {
 			throw new IllegalArgumentException("Buffer source must not be empty");
 		} else {
-			VkGpuBuffer glBuffer = new VkGpuBuffer(this.debugLabels, supplier, bufferType, bufferUsage, byteBuffer.remaining());
+			VkBuffer glBuffer = new VkBuffer(this.debugLabels, supplier, bufferType, bufferUsage, byteBuffer.remaining());
 			this.encoder.writeToBuffer(glBuffer, byteBuffer, 0);
 			return glBuffer;
 		}
@@ -209,9 +217,9 @@ public class VkGpuDevice implements GpuDevice {
 
 		this.pipelineCache.clear();
 
-		for (GlShaderModule glShaderModule : this.shaderCache.values()) {
-			if (glShaderModule != GlShaderModule.INVALID_SHADER) {
-				glShaderModule.close();
+		for (VkShaderModule vkShaderModule : this.shaderCache.values()) {
+			if (vkShaderModule != VkShaderModule.INVALID_SHADER) {
+				vkShaderModule.close();
 			}
 		}
 
@@ -228,7 +236,7 @@ public class VkGpuDevice implements GpuDevice {
 		this.clearPipelineCache();
 	}
 
-	protected GlShaderModule getOrCompileShader(
+	protected VkShaderModule getOrCompileShader(
 			ResourceLocation resourceLocation, ShaderType shaderType, ShaderDefines shaderDefines, BiFunction<ResourceLocation, ShaderType, String> biFunction
 	) {
 		ShaderCompilationKey shaderCompilationKey = new ShaderCompilationKey(resourceLocation, shaderType, shaderDefines);
@@ -270,11 +278,11 @@ public class VkGpuDevice implements GpuDevice {
 		this.compilePipeline(renderPipeline, this.defaultShaderSource);
 	}
 
-	private GlShaderModule compileShader(ShaderCompilationKey shaderCompilationKey, BiFunction<ResourceLocation, ShaderType, String> biFunction) {
+	private VkShaderModule compileShader(ShaderCompilationKey shaderCompilationKey, BiFunction<ResourceLocation, ShaderType, String> biFunction) {
 		String string = biFunction.apply(shaderCompilationKey.id, shaderCompilationKey.type);
 		if (string == null) {
 			LOGGER.error("Couldn't find source for {} shader ({})", shaderCompilationKey.type, shaderCompilationKey.id);
-			return GlShaderModule.INVALID_SHADER;
+			return VkShaderModule.INVALID_SHADER;
 		} else {
 			String string2 = GlslPreprocessor.injectDefines(string, shaderCompilationKey.defines);
 			int i = GlStateManager.glCreateShader(GlConst.toGl(shaderCompilationKey.type));
@@ -283,11 +291,11 @@ public class VkGpuDevice implements GpuDevice {
 			if (GlStateManager.glGetShaderi(i, GL20.GL_COMPILE_STATUS) == 0) {
 				String string3 = StringUtils.trim(GlStateManager.glGetShaderInfoLog(i, Short.MAX_VALUE + 1));
 				LOGGER.error("Couldn't compile {} shader ({}): {}", shaderCompilationKey.type.getName(), shaderCompilationKey.id, string3);
-				return GlShaderModule.INVALID_SHADER;
+				return VkShaderModule.INVALID_SHADER;
 			} else {
-				GlShaderModule glShaderModule = new GlShaderModule(i, shaderCompilationKey.id, shaderCompilationKey.type);
-				this.debugLabels.applyLabel(glShaderModule);
-				return glShaderModule;
+				VkShaderModule vkShaderModule = new VkShaderModule(i, shaderCompilationKey.id, shaderCompilationKey.type);
+				this.debugLabels.applyLabel(vkShaderModule);
+				return vkShaderModule;
 			}
 		}
 	}
@@ -305,11 +313,11 @@ public class VkGpuDevice implements GpuDevice {
 		Pipeline.Builder builder = new Pipeline.Builder(renderPipeline.getVertexFormat(), configName);
 
 
-		EGlProgram eGlProgram = new EGlProgram(1, configName);
-		eGlProgram.setupUniforms(renderPipeline.getUniforms(), renderPipeline.getSamplers());
+		VkProgram vkProgram = new VkProgram(1, configName);
+		vkProgram.setupUniforms(renderPipeline.getUniforms(), renderPipeline.getSamplers());
 
 		ExtendedRenderPipeline extPipeline = ExtendedRenderPipeline.of(renderPipeline);
-		extPipeline.setProgram(eGlProgram);
+		extPipeline.setProgram(vkProgram);
 
 		JsonObject config = ShaderLoadUtil.getJsonConfig("core", configName);
 
@@ -377,21 +385,4 @@ public class VkGpuDevice implements GpuDevice {
 		}
 	}
 
-	private static class VkRenderPipeline implements CompiledRenderPipeline {
-		final RenderPipeline renderPipeline;
-
-		public VkRenderPipeline(RenderPipeline renderPipeline) {
-			this.renderPipeline = renderPipeline;
-		}
-
-		@Override
-		public boolean containsUniform(String string) {
-			return ExtendedRenderPipeline.of(this.renderPipeline).getProgram().getUniform(string) != null;
-		}
-
-		@Override
-		public boolean isValid() {
-			return true;
-		}
-	}
 }

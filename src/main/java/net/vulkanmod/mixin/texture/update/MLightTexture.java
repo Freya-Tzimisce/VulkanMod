@@ -15,7 +15,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.vulkanmod.gl.VkGlTexture;
 import net.vulkanmod.mixin.texture.image.NativeImageAccessor;
-import net.vulkanmod.render.engine.VkGpuTexture;
+import net.vulkanmod.render.engine.VkTexture;
 import net.vulkanmod.render.texture.ImageUploadHelper;
 import net.vulkanmod.vulkan.queue.CommandPool;
 import org.joml.Vector3f;
@@ -180,7 +180,7 @@ public class MLightTexture {
                 this.lightTexture.upload();
 
                 try (MemoryStack stack = MemoryStack.stackPush()) {
-                    VkGlTexture.getTexture(((VkGpuTexture)this.lightTexture.getTexture()).glId()).getVulkanImage().readOnlyLayout(stack, commandBuffer.getHandle());
+                    VkGlTexture.getTexture(((VkTexture)this.lightTexture.getTexture()).glId()).getVulkanImage().readOnlyLayout(stack, commandBuffer.getHandle());
                 }
 
                 profilerFiller.pop();

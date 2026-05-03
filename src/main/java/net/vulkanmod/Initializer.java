@@ -12,11 +12,10 @@ import org.slf4j.Logger;
 
 public class Initializer implements ClientModInitializer {
 	private static final Logger LOGGER = LogUtil.getLogger();
-
 	private static final String MOD_ID = "vulkanmod";
 	private static final String MOD_NAME = "VulkanMod";
 
-	private static String VERSION;
+	private static String VERSION = "";
 
 	@Override
 	public void onInitializeClient() {
@@ -35,7 +34,7 @@ public class Initializer implements ClientModInitializer {
 
 		var configPath = FabricLoader.getInstance()
 				.getConfigDir()
-				.resolve("vulkanmod_settings.json");
+				.resolve("vulkanmod.json");
 
 		ConfigManager.init(configPath);
 

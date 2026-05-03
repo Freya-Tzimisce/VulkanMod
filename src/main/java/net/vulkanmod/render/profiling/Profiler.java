@@ -19,7 +19,7 @@ public class Profiler {
     private static final float INV_CONVERSION = 1.0f / CONVERSION;
     private static final int SAMPLE_COUNT = 200;
 
-    public static boolean ACTIVE = FORCE_ACTIVE;
+    private static boolean ACTIVE = FORCE_ACTIVE;
 
     private static final Profiler MAIN_PROFILER = new Profiler("Main");
 
@@ -88,8 +88,9 @@ public class Profiler {
             return;
 
         if (nodeStack.isEmpty()) {
-            if (DEBUG)
+            if (DEBUG) {
                 LOGGER.error("Profiler %s: Pop called with no more nodes on the stack".formatted(name));
+            }
 
             return;
         }
@@ -109,8 +110,9 @@ public class Profiler {
             return;
 
         if (!nodeStack.isEmpty()) {
-            if (DEBUG)
+            if (DEBUG) {
                 LOGGER.error("Profiler %s: Node stack is not empty".formatted(name));
+            }
 
             nodeStack.clear();
             startTimes.clear();
@@ -128,14 +130,13 @@ public class Profiler {
     }
 
     public void end() {
-        if (!(ACTIVE))
-            return;
+        if (ACTIVE) {
+            if (DEBUG && currentNode != mainNode) {
+                LOGGER.error("Profiler %s: current node is not the main node".formatted(name));
+            }
 
-        if (DEBUG && currentNode != mainNode) {
-            LOGGER.error("Profiler %s: current node is not the main node".formatted(name));
+            this.pop();
         }
-
-        this.pop();
     }
 
     public void round() {

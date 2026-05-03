@@ -129,8 +129,7 @@ public abstract class GuiElement implements GuiEventListener, NarratableEntry {
 
     @Override
     public boolean isMouseOver(double mouseX, double mouseY) {
-        return mouseX >= this.x && mouseY >= this.y
-                && mouseX <= (this.x + this.width) && mouseY <= (this.y + this.height);
+        return mouseX >= this.x && mouseY >= this.y && mouseX <= (this.x + this.width) && mouseY <= (this.y + this.height);
     }
 
     @Nullable

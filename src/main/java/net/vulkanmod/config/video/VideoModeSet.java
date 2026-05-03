@@ -1,97 +1,70 @@
 package net.vulkanmod.config.video;
 
+import com.mojang.blaze3d.platform.VideoMode;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.util.List;
 
 public class VideoModeSet {
-    public final int width;
-    public final int height;
-    public final int bitDepth;
-    List<Integer> refreshRates = new ObjectArrayList<>();
+	public final int width;
+	public final int height;
+	public final int redBits;
+	public final int greenBits;
+	public final int blueBits;
+	List<Integer> refreshRates = new ObjectArrayList<>();
 
-    public static VideoModeSet getDummy() {
-        var set = new VideoModeSet(-1, -1, -1);
-        set.addRefreshRate(-1);
-        return set;
-    }
+	public VideoModeSet(int width, int height, int redBits, int greenBits, int blueBits) {
+		this.width = width;
+		this.height = height;
+		this.redBits = redBits;
+		this.greenBits = greenBits;
+		this.blueBits = blueBits;
+	}
 
-    public VideoModeSet(int width, int height, int bitDepth) {
-        this.width = width;
-        this.height = height;
-        this.bitDepth = bitDepth;
-    }
+	public int getRefreshRate() {
+		return this.refreshRates.getFirst();
+	}
 
-    public int getRefreshRate() {
-        return this.refreshRates.getFirst();
-    }
+	public boolean hasRefreshRate(int refreshRate) {
+		return this.refreshRates.contains(refreshRate);
+	}
 
-    public boolean hasRefreshRate(int refreshRate) {
-        return this.refreshRates.contains(refreshRate);
-    }
+	public List<Integer> getRefreshRates() {
+		return this.refreshRates;
+	}
 
-    public List<Integer> getRefreshRates() {
-        return this.refreshRates;
-    }
+	void addRefreshRate(int refreshRate) {
+		this.refreshRates.add(refreshRate);
+	}
 
-    void addRefreshRate(int refreshRate) {
-        this.refreshRates.add(refreshRate);
-    }
+//	public String toString() {
+//		return this.width + " x " + this.height;
+//	}
 
-    public String toString() {
-        return this.width + " x " + this.height;
-    }
+//	@Override
+//	public boolean equals(Object o) {
+//		if (this == o) {
+//			return true;
+//		}
+//		if (o == null || getClass() != o.getClass()) {
+//			return false;
+//		}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+//		VideoModeSet that = (VideoModeSet) o;
+//		return width == that.width && height == that.height && redBits == that.redBits && greenBits == that.greenBits && blueBits == that.blueBits && refreshRates.equals(that.refreshRates);
+//	}
 
-        VideoModeSet that = (VideoModeSet) o;
-        return width == that.width && height == that.height && bitDepth == that.bitDepth && refreshRates.equals(that.refreshRates);
-    }
+//	public VideoMode getVideoMode(int refresh) {
+//		int index = refreshRates.indexOf(refresh);
 
-    public VideoMode getVideoMode(int refresh) {
-        int index = refreshRates.indexOf(refresh);
+//		if (index == -1) {
+//			index = 0;
+//		}
 
-        if (index == -1) {
-            index = 0;
-        }
+//		return new VideoMode(this.width, this.height, this.redBits, this.greenBits, this.blueBits, this.refreshRates.get(index));
+//	}
 
-        return new VideoMode(this.width, this.height, this.bitDepth, this.refreshRates.get(index));
-    }
-
-    public VideoMode getVideoMode() {
-        int refreshRate = this.refreshRates.getLast();
-        return new VideoMode(this.width, this.height, this.bitDepth, refreshRate);
-    }
-
-    public static final class VideoMode {
-        public int width;
-        public int height;
-        public int bitDepth;
-        public int refreshRate;
-
-        public VideoMode(int width, int height, int bitDepth, int refreshRate) {
-            this.width = width;
-            this.height = height;
-            this.bitDepth = bitDepth;
-            this.refreshRate = refreshRate;
-        }
-
-        @Override
-        public String toString() {
-            return "VideoMode["
-                    + "width=" + width + ", "
-                    + "height=" + height + ", "
-                    + "bitDepth=" + bitDepth + ", "
-                    + "refreshRate=" + refreshRate + ']';
-        }
-
-    }
-
+	public VideoMode getVideoMode() {
+		return new VideoMode(this.width, this.height, this.redBits, this.greenBits, this.blueBits, this.refreshRates.getLast());
+	}
 }

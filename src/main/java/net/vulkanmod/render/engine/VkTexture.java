@@ -1,8 +1,6 @@
 package net.vulkanmod.render.engine;
 
-import com.mojang.blaze3d.opengl.GlConst;
 import com.mojang.blaze3d.opengl.GlStateManager;
-import com.mojang.blaze3d.opengl.GlTexture;
 import com.mojang.blaze3d.textures.AddressMode;
 import com.mojang.blaze3d.textures.FilterMode;
 import com.mojang.blaze3d.textures.GpuTexture;
@@ -13,18 +11,17 @@ import net.vulkanmod.gl.VkGlTexture;
 import net.vulkanmod.vulkan.texture.SamplerManager;
 import net.vulkanmod.vulkan.texture.VulkanImage;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.vulkan.VK10;
 
-public class VkGpuTexture extends GlTexture {
+public class VkTexture extends GpuTexture {
 	protected VkGlTexture glTexture;
 	protected final int id;
 	private final Int2ReferenceMap<VkFbo> fboCache = new Int2ReferenceOpenHashMap<>();
 	protected boolean closed;
 	protected boolean modesDirty = true;
 
-	protected VkGpuTexture(String string, TextureFormat textureFormat, int width, int height, int mipLevel, int id, VkGlTexture glTexture) {
-		super(string, textureFormat, width, height, mipLevel, id);
+	protected VkTexture(String string, TextureFormat textureFormat, int width, int height, int mipLevel, int id, VkGlTexture glTexture) {
+		super(string, textureFormat, width, height, mipLevel);
 		this.id = id;
 		this.glTexture = glTexture;
 	}
@@ -34,6 +31,12 @@ public class VkGpuTexture extends GlTexture {
 		if (!this.closed) {
 			this.closed = true;
 			GlStateManager._deleteTexture(this.id);
+//			IntIterator var1 = this.fboCache.values().iterator();
+
+//			while (var1.hasNext()) {
+//				int i = (Integer)var1.next();
+//				GlStateManager._glDeleteFramebuffers(i);
+//			}
 
 			for (VkFbo fbo : this.fboCache.values()) {
 				fbo.close();
@@ -46,34 +49,34 @@ public class VkGpuTexture extends GlTexture {
 		return this.closed;
 	}
 
-	// public int getFbo(DirectStateAccess directStateAccess, @Nullable GpuTexture gpuTexture) {
-	//     int i = gpuTexture == null ? 0 : ((VkGpuTexture)gpuTexture).id;
-	//     return this.fboCache.computeIfAbsent(i, j -> {
-	//         int k = directStateAccess.createFrameBufferObject();
-	//         directStateAccess.bindFrameBufferTextures(k, this.id, i, 0, 0);
-	//         return k;
-	//     });
-	// }
+//	public int getFbo(DirectStateAccess directStateAccess, @Nullable GpuTexture gpuTexture) {
+//		int i = gpuTexture == null ? 0 : ((VkTexture)gpuTexture).id;
+//		return this.fboCache.computeIfAbsent(i, j -> {
+//			int k = directStateAccess.createFrameBufferObject();
+//			directStateAccess.bindFrameBufferTextures(k, this.id, i, 0, 0);
+//			return k;
+//		});
+//	}
 
 	public void flushModeChanges() {
 		if (this.modesDirty) {
-			// GlStateManager._texParameter(3553, 10242, GlConst.toGl(this.addressModeU));
-			// GlStateManager._texParameter(3553, 10243, GlConst.toGl(this.addressModeV));
-			// switch (this.minFilter) {
-			//     case NEAREST:
-			//         GlStateManager._texParameter(3553, 10241, this.useMipmaps ? 9986 : 9728);
-			//         break;
-			//     case LINEAR:
-			//         GlStateManager._texParameter(3553, 10241, this.useMipmaps ? 9987 : 9729);
-			// }
+//			GlStateManager._texParameter(3553, 10242, VkConst.toVk(this.addressModeU));
+//			GlStateManager._texParameter(3553, 10243, VkConst.toVk(this.addressModeV));
+//			switch (this.minFilter) {
+//				case NEAREST:
+//					GlStateManager._texParameter(3553, 10241, this.useMipmaps ? 9986 : 9728);
+//					break;
+//				case LINEAR:
+//					GlStateManager._texParameter(3553, 10241, this.useMipmaps ? 9987 : 9729);
+//			}
 
-			// switch (this.magFilter) {
-			//     case NEAREST:
-			//         GlStateManager._texParameter(3553, 10240, 9728);
-			//         break;
-			//     case LINEAR:
-			//         GlStateManager._texParameter(3553, 10240, 9729);
-			// }
+//			switch (this.magFilter) {
+//				case NEAREST:
+//					GlStateManager._texParameter(3553, 10240, 9728);
+//					break;
+//				case LINEAR:
+//					GlStateManager._texParameter(3553, 10240, 9729);
+//			}
 
 			byte samplerFlags = (byte) (this.magFilter == FilterMode.LINEAR ? SamplerManager.LINEAR_FILTERING_BIT : 0);
 
@@ -106,8 +109,8 @@ public class VkGpuTexture extends GlTexture {
 	}
 
 	public VkFbo getFbo(@Nullable GpuTexture depthAttachment) {
-		int depthAttachmentId = depthAttachment == null ? 0 : ((VkGpuTexture)depthAttachment).id;
-		return this.fboCache.computeIfAbsent(depthAttachmentId, j -> new VkFbo(this, (VkGpuTexture) depthAttachment));
+		int depthAttachmentId = depthAttachment == null ? 0 : ((VkTexture)depthAttachment).id;
+		return this.fboCache.computeIfAbsent(depthAttachmentId, j -> new VkFbo(this, (VkTexture) depthAttachment));
 	}
 
 	public VulkanImage getVulkanImage() {
@@ -123,11 +126,4 @@ public class VkGpuTexture extends GlTexture {
 		};
 	}
 
-	public static int vkFormat(TextureFormat textureFormat) {
-		return switch (textureFormat) {
-			case RGBA8 -> VK10.VK_FORMAT_R8G8B8A8_UNORM;
-			case RED8 -> VK10.VK_FORMAT_R8_UNORM;
-			case DEPTH32 -> VK10.VK_FORMAT_D32_SFLOAT;
-		};
-	}
 }

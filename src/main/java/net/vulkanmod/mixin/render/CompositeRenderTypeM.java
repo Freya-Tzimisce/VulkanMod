@@ -11,9 +11,9 @@ import com.mojang.blaze3d.vertex.MeshData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.vulkanmod.interfaces.shader.ExtendedRenderPipeline;
-import net.vulkanmod.render.engine.EGlProgram;
+import net.vulkanmod.render.engine.VkProgram;
 import net.vulkanmod.render.engine.VkCommandEncoder;
-import net.vulkanmod.render.engine.VkGpuTexture;
+import net.vulkanmod.render.engine.VkTexture;
 import net.vulkanmod.vulkan.Renderer;
 import net.vulkanmod.vulkan.VRenderSystem;
 import net.vulkanmod.vulkan.shader.GraphicsPipeline;
@@ -61,19 +61,19 @@ public abstract class CompositeRenderTypeM {
             for (int i = 0; i < 12; i++) {
                GpuTexture gpuTexture = RenderSystem.getShaderTexture(i);
                if (gpuTexture != null) {
-                  if (((VkGpuTexture)gpuTexture).getVulkanImage() == null) {
+                  if (((VkTexture)gpuTexture).getVulkanImage() == null) {
                      throw new NullPointerException();
                   }
 
                   renderPass.bindSampler("Sampler" + i, gpuTexture);
-                  VTextureSelector.bindTexture(i, ((VkGpuTexture)gpuTexture).getVulkanImage());
+                  VTextureSelector.bindTexture(i, ((VkTexture)gpuTexture).getVulkanImage());
                }
             }
 
             VRenderSystem.applyModelViewMatrix(RenderSystem.getModelViewMatrix());
             VRenderSystem.applyProjectionMatrix(RenderSystem.getProjectionMatrix());
             VRenderSystem.calculateMVP();
-            EGlProgram glProgram = ExtendedRenderPipeline.of(renderPipeline).getProgram();
+            VkProgram glProgram = ExtendedRenderPipeline.of(renderPipeline).getProgram();
             Window window = Minecraft.getInstance().getWindow();
             glProgram.setDefaultUniforms(
                     renderPipeline.getVertexFormatMode(),

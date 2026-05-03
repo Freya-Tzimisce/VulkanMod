@@ -1,7 +1,7 @@
 package net.vulkanmod.interfaces.shader;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import net.vulkanmod.render.engine.EGlProgram;
+import net.vulkanmod.render.engine.VkProgram;
 import net.vulkanmod.vulkan.shader.GraphicsPipeline;
 import net.vulkanmod.vulkan.shader.Pipeline;
 import net.vulkanmod.vulkan.shader.descriptor.UBO;
@@ -21,9 +21,9 @@ public interface ExtendedRenderPipeline {
 
    void setPipeline(GraphicsPipeline pipeline);
 
-   void setProgram(EGlProgram program);
+   void setProgram(VkProgram program);
 
    Pipeline getPipeline();
 
-   EGlProgram getProgram();
+   VkProgram getProgram();
 }

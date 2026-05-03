@@ -99,7 +99,7 @@ public abstract class GuiRenderer {
     }
 
     public static void drawString(Font font, Component component, int x, int y, int color) {
-        drawString(font, component.getVisualOrderText(), x, y, color);
+        guiGraphics.drawString(font, component.getVisualOrderText(), x, y, color);
     }
 
     public static void drawString(Font font, FormattedCharSequence formattedCharSequence, int x, int y, int color) {
@@ -107,7 +107,7 @@ public abstract class GuiRenderer {
     }
 
     public static void drawString(Font font, Component component, int x, int y, int color, boolean shadow) {
-        drawString(font, component.getVisualOrderText(), x, y, color, shadow);
+        guiGraphics.drawString(font, component.getVisualOrderText(), x, y, color, shadow);
     }
 
     public static void drawString(Font font, FormattedCharSequence formattedCharSequence, int x, int y, int color, boolean shadow) {

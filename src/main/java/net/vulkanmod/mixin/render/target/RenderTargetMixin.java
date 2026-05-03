@@ -9,7 +9,7 @@ import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.vulkanmod.render.engine.VkFbo;
-import net.vulkanmod.render.engine.VkGpuTexture;
+import net.vulkanmod.render.engine.VkTexture;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,7 +39,7 @@ public abstract class RenderTargetMixin {
     public void blitAndBlendToTexture(GpuTexture gpuTexture) {
         RenderSystem.assertOnRenderThread();
 
-        VkFbo fbo = ((VkGpuTexture)this.colorTexture).getFbo(this.depthTexture);
+        VkFbo fbo = ((VkTexture)this.colorTexture).getFbo(this.depthTexture);
         if (!fbo.needsClear()) {
             AutoStorageIndexBuffer autoStorageIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
             GpuBuffer gpuBuffer = autoStorageIndexBuffer.getBuffer(6);

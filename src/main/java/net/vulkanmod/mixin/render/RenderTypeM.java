@@ -15,7 +15,7 @@ public class RenderTypeM implements ExtendedRenderType {
 	TerrainRenderType terrainRenderType;
 
 	@Inject(method = "<init>", at = @At("RETURN"))
-	private void inj(String string, int i, boolean bl, boolean bl2, Runnable runnable, Runnable runnable2, CallbackInfo ci) {
+	private void injected(String string, int i, boolean bl, boolean bl2, Runnable runnable, Runnable runnable2, CallbackInfo ci) {
 		terrainRenderType = switch (string) {
 			case "sky_block" -> TerrainRenderType.SKY_BLOCK;
 			case "solid" -> TerrainRenderType.SOLID;

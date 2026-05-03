@@ -3,8 +3,6 @@ package net.vulkanmod.render.engine;
 import com.mojang.blaze3d.buffers.BufferType;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.opengl.GlConst;
-import com.mojang.blaze3d.opengl.GlProgram;
-import com.mojang.blaze3d.opengl.GlRenderPass;
 import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.opengl.Uniform;
 import com.mojang.blaze3d.pipeline.BlendFunction;
@@ -12,16 +10,15 @@ import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.CommandEncoder;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ARGB;
 import net.vulkanmod.interfaces.shader.ExtendedRenderPipeline;
+import net.vulkanmod.util.LogUtil;
 import net.vulkanmod.vulkan.Renderer;
 import net.vulkanmod.vulkan.VRenderSystem;
 import net.vulkanmod.vulkan.framebuffer.Framebuffer;
@@ -48,18 +45,20 @@ import java.util.OptionalInt;
 import java.util.function.Consumer;
 
 public class VkCommandEncoder implements CommandEncoder {
-	private static final Logger LOGGER = LogUtils.getLogger();
-	private final VkGpuDevice device;
-
+	private static final Logger LOGGER = LogUtil.getLogger();
+	private final VkDevice device;
+//	private final int readFbo;
+//	private final int drawFbo;
 	@Nullable
 	private RenderPipeline lastPipeline;
 	private boolean inRenderPass;
-
 	@Nullable
-	private EGlProgram lastProgram;
+	private VkProgram lastProgram;
 
-	protected VkCommandEncoder(VkGpuDevice glDevice) {
-		this.device = glDevice;
+	protected VkCommandEncoder(VkDevice vkDevice) {
+		this.device = vkDevice;
+//		this.readFbo = vkDevice.directStateAccess().createFrameBufferObject();
+//		this.drawFbo = vkDevice.directStateAccess().createFrameBufferObject();
 	}
 
 	@Override
@@ -68,15 +67,15 @@ public class VkCommandEncoder implements CommandEncoder {
 	}
 
 	@Override
-	public RenderPass createRenderPass(GpuTexture colorTexture, OptionalInt optionalInt, @Nullable GpuTexture depthTexture, OptionalDouble optionalDouble) {
+	public RenderPass createRenderPass(GpuTexture gpuTexture, OptionalInt optionalInt, @Nullable GpuTexture gpuTexture2, OptionalDouble optionalDouble) {
 		if (this.inRenderPass) {
 			throw new IllegalStateException("Close the existing render pass before creating a new one!");
 		} else {
-			if (optionalDouble.isPresent() && depthTexture == null) {
+			if (optionalDouble.isPresent() && gpuTexture2 == null) {
 				LOGGER.warn("Depth clear value was provided but no depth texture is being used");
 			}
 
-			if (Minecraft.getInstance().getMainRenderTarget().getColorTexture() == colorTexture) {
+			if (Minecraft.getInstance().getMainRenderTarget().getColorTexture() == gpuTexture) {
 				Renderer.getInstance().getMainPass().rebindMainTarget();
 
 				int j = 0;
@@ -86,7 +85,7 @@ public class VkCommandEncoder implements CommandEncoder {
 					j |= 16384;
 				}
 
-				if (depthTexture != null && optionalDouble.isPresent()) {
+				if (gpuTexture2 != null && optionalDouble.isPresent()) {
 					GL11.glClearDepth(optionalDouble.getAsDouble());
 					j |= 256;
 				}
@@ -98,16 +97,16 @@ public class VkCommandEncoder implements CommandEncoder {
 					GlStateManager._clear(j);
 				}
 
-				return new VkRenderPass(this, depthTexture != null);
+				return new VkRenderPass(this, gpuTexture2 != null);
 			}
 
-			if (colorTexture.isClosed()) {
+			if (gpuTexture.isClosed()) {
 				throw new IllegalStateException("Color texture is closed");
-			} else if (depthTexture != null && depthTexture.isClosed()) {
+			} else if (gpuTexture2 != null && gpuTexture2.isClosed()) {
 				throw new IllegalStateException("Depth texture is closed");
 			} else {
 				this.inRenderPass = true;
-				VkFbo fbo = ((VkGpuTexture)colorTexture).getFbo(depthTexture);
+				VkFbo fbo = ((VkTexture)gpuTexture).getFbo(gpuTexture2);
 				fbo.bind();
 
 				int jx = 0;
@@ -117,7 +116,7 @@ public class VkCommandEncoder implements CommandEncoder {
 					jx |= 16384;
 				}
 
-				if (depthTexture != null && optionalDouble.isPresent()) {
+				if (gpuTexture2 != null && optionalDouble.isPresent()) {
 					GL11.glClearDepth(optionalDouble.getAsDouble());
 					jx |= 256;
 				}
@@ -129,9 +128,9 @@ public class VkCommandEncoder implements CommandEncoder {
 					GlStateManager._clear(jx);
 				}
 
-				GlStateManager._viewport(0, 0, colorTexture.getWidth(0), colorTexture.getHeight(0));
+				GlStateManager._viewport(0, 0, gpuTexture.getWidth(0), gpuTexture.getHeight(0));
 				this.lastPipeline = null;
-				return new VkRenderPass(this, depthTexture != null);
+				return new VkRenderPass(this, gpuTexture2 != null);
 			}
 		}
 
@@ -162,15 +161,15 @@ public class VkCommandEncoder implements CommandEncoder {
 				Renderer.clearAttachments(0x4100);
 			}
 			else {
-				VkFbo fbo = ((VkGpuTexture)colorAttachment).getFbo(depthAttachment);
+				VkFbo fbo = ((VkTexture)colorAttachment).getFbo(depthAttachment);
 
 				fbo.clear = 0x4100;
 				fbo.clearColor = clearColor;
 				fbo.clearDepth = (float) clearDepth;
 
 				Framebuffer boundFramebuffer = Renderer.getInstance().getBoundFramebuffer();
-				if (boundFramebuffer.getColorAttachment() == ((VkGpuTexture) colorAttachment).getVulkanImage()
-						&& boundFramebuffer.getDepthAttachment() == ((VkGpuTexture) depthAttachment).getVulkanImage())
+				if (boundFramebuffer.getColorAttachment() == ((VkTexture) colorAttachment).getVulkanImage()
+						&& boundFramebuffer.getDepthAttachment() == ((VkTexture) depthAttachment).getVulkanImage())
 				{
 					fbo.clearAttachments();
 				}
@@ -193,26 +192,26 @@ public class VkCommandEncoder implements CommandEncoder {
 		if (this.inRenderPass) {
 			throw new IllegalStateException("Close the existing render pass before performing additional commands");
 		} else {
-			VkGpuBuffer vkGpuBuffer = (VkGpuBuffer)gpuBuffer;
-			if (vkGpuBuffer.closed) {
+			VkBuffer vkBuffer = (VkBuffer)gpuBuffer;
+			if (vkBuffer.closed) {
 				throw new IllegalStateException("Buffer already closed");
 			}
-			else if (!vkGpuBuffer.usage().isWritable()) {
+			else if (!vkBuffer.usage().isWritable()) {
 				throw new IllegalStateException("Buffer is not writable");
 			}
 			else {
 				int remaining = byteBuffer.remaining();
-				if (remaining + offset > vkGpuBuffer.size) {
+				if (remaining + offset > vkBuffer.size) {
 					throw new IllegalArgumentException(
-							"Cannot write more data than this buffer can hold (attempting to write " + remaining + " bytes at offset " + offset + " to " + vkGpuBuffer.size + " size buffer)"
+							"Cannot write more data than this buffer can hold (attempting to write " + remaining + " bytes at offset " + offset + " to " + vkBuffer.size + " size buffer)"
 					);
 				} else {
-					if (!vkGpuBuffer.initialized) {
-						vkGpuBuffer.buffer.createBuffer(vkGpuBuffer.size());
-						vkGpuBuffer.initialized = true;
+					if (!vkBuffer.initialized) {
+						vkBuffer.buffer.createBuffer(vkBuffer.size());
+						vkBuffer.initialized = true;
 					}
 
-					vkGpuBuffer.buffer.copyBuffer(byteBuffer, byteBuffer.remaining(), offset);
+					vkBuffer.buffer.copyBuffer(byteBuffer, byteBuffer.remaining(), offset);
 				}
 			}
 		}
@@ -228,7 +227,7 @@ public class VkCommandEncoder implements CommandEncoder {
 		if (this.inRenderPass) {
 			throw new IllegalStateException("Close the existing render pass before performing additional commands");
 		} else {
-			VkGpuBuffer vkGpuBuffer = (VkGpuBuffer)gpuBuffer;
+			VkBuffer vkGpuBuffer = (VkBuffer)gpuBuffer;
 			if (vkGpuBuffer.closed) {
 				throw new IllegalStateException("Buffer already closed");
 			} else if (!vkGpuBuffer.usage().isReadable()) {
@@ -247,7 +246,7 @@ public class VkCommandEncoder implements CommandEncoder {
 				throw new IllegalArgumentException("Buffer not mappable");
 			} else {
 				ByteBuffer byteBuffer = MemoryUtil.memByteBuffer(vkGpuBuffer.getBuffer().getDataPtr() + offset, size);
-				return new VkGpuBuffer.ReadView(0, byteBuffer);
+				return new VkBuffer.ReadView(0, byteBuffer);
 			}
 		}
 	}
@@ -295,7 +294,7 @@ public class VkCommandEncoder implements CommandEncoder {
 				throw new IllegalStateException("Destination texture is closed");
 			} else {
 				VTextureSelector.setActiveTexture(0);
-				VTextureSelector.bindTexture(((VkGpuTexture) gpuTexture).getVulkanImage());
+				VTextureSelector.bindTexture(((VkTexture) gpuTexture).getVulkanImage());
 				VTextureSelector.uploadSubTexture(level, width, height, xOffset, yOffset, unpackSkipRows, unpackSkipPixels, nativeImage.getWidth(), nativeImage.getPointer());
 			}
 		} else {
@@ -330,7 +329,7 @@ public class VkCommandEncoder implements CommandEncoder {
 			} else if (gpuTexture.isClosed()) {
 				throw new IllegalStateException("Destination texture is closed");
 			} else {
-				GlStateManager._bindTexture(((VkGpuTexture)gpuTexture).id);
+				GlStateManager._bindTexture(((VkTexture)gpuTexture).id);
 				GlStateManager._pixelStore(3314, l);
 				GlStateManager._pixelStore(3316, 0);
 				GlStateManager._pixelStore(3315, 0);
@@ -353,8 +352,8 @@ public class VkCommandEncoder implements CommandEncoder {
 
 	@Override
 	public void copyTextureToBuffer(GpuTexture gpuTexture, GpuBuffer gpuBuffer, int dstOffset, Runnable runnable, int mipLevel, int xOffset, int yOffset, int width, int height) {
-		VkGpuBuffer vkGpuBuffer = (VkGpuBuffer) gpuBuffer;
-		VkGpuTexture vkGpuTexture = (VkGpuTexture) gpuTexture;
+		VkBuffer vkGpuBuffer = (VkBuffer) gpuBuffer;
+		VkTexture vkGpuTexture = (VkTexture) gpuTexture;
 
 		if (this.inRenderPass) {
 			throw new IllegalStateException("Close the existing render pass before performing additional commands");
@@ -475,7 +474,7 @@ public class VkCommandEncoder implements CommandEncoder {
 				renderPass.setIndexBuffer(draw.indexBuffer() == null ? gpuBuffer : draw.indexBuffer(), indexType2);
 				renderPass.setVertexBuffer(draw.slot(), draw.vertexBuffer());
 
-				if (GlRenderPass.VALIDATION) {
+				if (VkRenderPass.VALIDATION) {
 					if (renderPass.indexBuffer == null) {
 						throw new IllegalStateException("Missing index buffer");
 					}
@@ -496,8 +495,8 @@ public class VkCommandEncoder implements CommandEncoder {
 				Consumer<RenderPass.UniformUploader> consumer = draw.uniformUploaderConsumer();
 				if (consumer != null) {
 					consumer.accept((string, fs) -> {
-						EGlProgram glProgram = ExtendedRenderPipeline.of(renderPass.pipeline).getProgram();
-						Uniform uniform = glProgram.getUniform(string);
+						VkProgram vkProgram = ExtendedRenderPipeline.of(renderPass.pipeline).getProgram();
+						Uniform uniform = vkProgram.getUniform(string);
 						if (uniform != null) {
 							uniform.set(fs);
 						}
@@ -514,29 +513,29 @@ public class VkCommandEncoder implements CommandEncoder {
 		}
 	}
 
-	protected void executeDraw(VkRenderPass glRenderPass, int i, int j, @Nullable VertexFormat.IndexType indexType) {
-		if (this.trySetup(glRenderPass)) {
-			if (GlRenderPass.VALIDATION) {
+	protected void executeDraw(VkRenderPass vkRenderPass, int i, int j, @Nullable VertexFormat.IndexType indexType) {
+		if (this.trySetup(vkRenderPass)) {
+			if (VkRenderPass.VALIDATION) {
 				if (indexType != null) {
-					if (glRenderPass.indexBuffer == null) {
+					if (vkRenderPass.indexBuffer == null) {
 						throw new IllegalStateException("Missing index buffer");
 					}
 
-					if (glRenderPass.indexBuffer.isClosed()) {
+					if (vkRenderPass.indexBuffer.isClosed()) {
 						throw new IllegalStateException("Index buffer has been closed!");
 					}
 				}
 
-				if (glRenderPass.vertexBuffers[0] == null) {
+				if (vkRenderPass.vertexBuffers[0] == null) {
 					throw new IllegalStateException("Missing vertex buffer at slot 0");
 				}
 
-				if (glRenderPass.vertexBuffers[0].isClosed()) {
+				if (vkRenderPass.vertexBuffers[0].isClosed()) {
 					throw new IllegalStateException("Vertex buffer at slot 0 has been closed!");
 				}
 			}
 
-			this.drawFromBuffers(glRenderPass, i, j, indexType, glRenderPass.pipeline);
+			this.drawFromBuffers(vkRenderPass, i, j, indexType, vkRenderPass.pipeline);
 		}
 	}
 
@@ -544,12 +543,12 @@ public class VkCommandEncoder implements CommandEncoder {
 	                            @Nullable VertexFormat.IndexType indexType, RenderPipeline renderPipeline)
 	{
 		VkCommandBuffer vkCommandBuffer = Renderer.getCommandBuffer();
-		VkGpuBuffer vertexBuffer = (VkGpuBuffer)renderPass.vertexBuffers[0];
+		VkBuffer vertexBuffer = (VkBuffer)renderPass.vertexBuffers[0];
 
 		try (MemoryStack stack = MemoryStack.stackPush()) {
 			VK11.vkCmdBindVertexBuffers(vkCommandBuffer, 0, stack.longs(vertexBuffer.buffer.getId()), stack.longs(0L));
 			if (indexType != null) {
-				VkGpuBuffer indexBuffer = (VkGpuBuffer)renderPass.indexBuffer;
+				VkBuffer indexBuffer = (VkBuffer)renderPass.indexBuffer;
 
 				VK11.vkCmdBindIndexBuffer(vkCommandBuffer, indexBuffer.buffer.getId(), 0L, IndexBuffer.IndexType.UINT16.value);
 				VK11.vkCmdDrawIndexed(vkCommandBuffer, vertexCount, 1, firstIndex, 0, 0);
@@ -575,7 +574,7 @@ public class VkCommandEncoder implements CommandEncoder {
 
 			for (RenderPipeline.UniformDescription uniformDescription : renderPass.pipeline.getUniforms()) {
 				Object object = renderPass.uniforms.get(uniformDescription.name());
-				if (object == null && !GlProgram.BUILT_IN_UNIFORMS.contains(uniformDescription.name())) {
+				if (object == null && !VkProgram.BUILT_IN_UNIFORMS.contains(uniformDescription.name())) {
 					throw new IllegalStateException("Missing uniform " + uniformDescription.name() + " (should be " + uniformDescription.type() + ")");
 				}
 			}
@@ -599,15 +598,15 @@ public class VkCommandEncoder implements CommandEncoder {
 	// TODO
 	public void setupUniforms(VkRenderPass renderPass) {
 		RenderPipeline renderPipeline = renderPass.pipeline;
-		EGlProgram glProgram = ExtendedRenderPipeline.of(renderPass.pipeline).getProgram();
+		VkProgram vkProgram = ExtendedRenderPipeline.of(renderPass.pipeline).getProgram();
 
-		for (Uniform uniform : glProgram.getUniforms()) {
+		for (Uniform uniform : vkProgram.getUniforms()) {
 			if (renderPass.dirtyUniforms.contains(uniform.getName())) {
 				Object object2 = renderPass.uniforms.get(uniform.getName());
 				if (object2 instanceof int[]) {
-					glProgram.safeGetUniform(uniform.getName()).set((int[])object2);
+					vkProgram.safeGetUniform(uniform.getName()).set((int[])object2);
 				} else if (object2 instanceof float[]) {
-					glProgram.safeGetUniform(uniform.getName()).set((float[])object2);
+					vkProgram.safeGetUniform(uniform.getName()).set((float[])object2);
 				} else if (object2 != null) {
 					throw new IllegalStateException("Unknown uniform type - expected " + uniform.getType() + ", found " + object2);
 				}
@@ -616,16 +615,16 @@ public class VkCommandEncoder implements CommandEncoder {
 
 		renderPass.dirtyUniforms.clear();
 		this.applyPipelineState(renderPipeline);
-		boolean bl = this.lastProgram != glProgram;
+		boolean bl = this.lastProgram != vkProgram;
 		if (bl) {
-			this.lastProgram = glProgram;
+			this.lastProgram = vkProgram;
 		}
 
-		List<String> samplers = glProgram.getSamplers();
+		List<String> samplers = vkProgram.getSamplers();
 
 		for (int i = 0; i < samplers.size(); i++) {
 			String sampler = samplers.get(i);
-			VkGpuTexture glTexture = (VkGpuTexture) renderPass.samplers.get(sampler);
+			VkTexture glTexture = (VkTexture) renderPass.samplers.get(sampler);
 			if (glTexture != null) {
 				if (bl || renderPass.dirtySamplers.contains(sampler)) {
 					GlStateManager._activeTexture(33984 + i);
@@ -638,7 +637,7 @@ public class VkCommandEncoder implements CommandEncoder {
 		}
 
 		Window window = Minecraft.getInstance().getWindow();
-		glProgram.setDefaultUniforms(
+		vkProgram.setDefaultUniforms(
 				renderPipeline.getVertexFormatMode(),
 				RenderSystem.getModelViewMatrix(),
 				RenderSystem.getProjectionMatrix(),
@@ -722,7 +721,7 @@ public class VkCommandEncoder implements CommandEncoder {
 		this.inRenderPass = false;
 	}
 
-	protected VkGpuDevice getDevice() {
+	protected VkDevice getDevice() {
 		return this.device;
 	}
 }

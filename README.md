@@ -28,29 +28,8 @@ This is a fabric mod that introduces a brand new **Vulkan** based voxel renderin
 
 ### Install guide:
 >1) Install the [fabric modloader](https://fabricmc.net).
->1) Download and put the `Vulkanmod.jar` file into `.minecraft/mods`
->1) Enjoy !
-
-## Useful links
-<table>
-    <tr>
-      <th> Discord server</th>
-      <th> Ko-Fi</th>
-    </tr>
-  <tr>
-    <td style="text-align:center"> 
-        <a href="https://discord.gg/FVXg7AYR2Q"> 
-            <img alt="Discord" align="top" src="https://img.shields.io/discord/963180553547419670?style=flat-square&logo=discord&logoColor=%23FFFFFF&label=Vulkanmod%20official%20discord%20server&labelColor=%235865F2&color=%235865F2">
-        </a>
-     </td>
-    <td>
-        <a href="https://ko-fi.com/V7V7CHHJV">
-            <img alt="Static Badge" align="top" src="https://img.shields.io/badge/KoFi-%23ff5e5b?logo=ko-fi&logoColor=%23FFFFFF&link=https%3A%2F%2Fko-fi.com%2FV7V7CHHJV">
-        </a>
-    </td>
-  </tr>
-</table>
-
+>2) Download and put the `Vulkanmod.jar` file into `.minecraft/mods`
+>3) Enjoy !
 
 ## Features
 
@@ -69,7 +48,6 @@ This is a fabric mod that introduces a brand new **Vulkan** based voxel renderin
 >- [x] Resizable render frame queue
 >- [ ] Shader support
 >- [ ] Removed Herobrine
-
 
 ## Notes
 - This mod is still in development, please report issues in the [issue tab](https://github.com/xCollateral/VulkanMod/issues) with logs attached!

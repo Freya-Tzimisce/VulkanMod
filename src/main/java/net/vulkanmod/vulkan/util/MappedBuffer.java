@@ -1,5 +1,6 @@
 package net.vulkanmod.vulkan.util;
 
+import net.vulkanmod.util.UnsafeUtil;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
@@ -23,18 +24,18 @@ public class MappedBuffer {
     }
 
     public void putFloat(int idx, float f) {
-        VUtil.UNSAFE.putFloat(ptr + idx, f);
+        UnsafeUtil.getUnsafe().putFloat(ptr + idx, f);
     }
 
     public void putInt(int idx, int f) {
-        VUtil.UNSAFE.putInt(ptr + idx, f);
+        UnsafeUtil.getUnsafe().putInt(ptr + idx, f);
     }
 
     public float getFloat(int idx) {
-        return VUtil.UNSAFE.getFloat(ptr + idx);
+        return UnsafeUtil.getUnsafe().getFloat(ptr + idx);
     }
 
     public int getInt(int idx) {
-        return VUtil.UNSAFE.getInt(ptr + idx);
+        return UnsafeUtil.getUnsafe().getInt(ptr + idx);
     }
 }

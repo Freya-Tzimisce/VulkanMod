@@ -12,14 +12,14 @@ import org.jetbrains.annotations.Nullable;
 import java.nio.ByteBuffer;
 import java.util.function.Supplier;
 
-public class VkGpuBuffer extends GpuBuffer {
+public class VkBuffer extends GpuBuffer {
 	protected boolean closed;
 	protected boolean initialized = false;
-	@Nullable protected final Supplier<String> label;
+	@Nullable
+	protected final Supplier<String> label;
+	protected Buffer buffer;
 
-	Buffer buffer;
-
-	protected VkGpuBuffer(VkDebugLabel glDebugLabel, @Nullable Supplier<String> supplier, BufferType bufferType, BufferUsage bufferUsage, int size) {
+	protected VkBuffer(VkDebugLabel vkDebugLabel, @Nullable Supplier<String> supplier, BufferType bufferType, BufferUsage bufferUsage, int size) {
 		super(bufferType, bufferUsage, size);
 		this.label = supplier;
 
@@ -77,7 +77,7 @@ public class VkGpuBuffer extends GpuBuffer {
 
 		@Override
 		public void close() {
-//            GlStateManager._glUnmapBuffer(this.target);
+//			GlStateManager._glUnmapBuffer(this.target);
 		}
 	}
 }

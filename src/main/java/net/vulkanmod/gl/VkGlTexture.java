@@ -197,7 +197,7 @@ public class VkGlTexture {
             return -1;
 
         return switch (pName) {
-            case GL11.GL_TEXTURE_INTERNAL_FORMAT -> GlUtil.getGlFormat(boundTexture.vulkanImage.format);
+            case GL11.GL_TEXTURE_INTERNAL_FORMAT -> VkGlUtil.getGlFormat(boundTexture.vulkanImage.format);
             case GL11.GL_TEXTURE_WIDTH -> boundTexture.vulkanImage.width;
             case GL11.GL_TEXTURE_HEIGHT -> boundTexture.vulkanImage.height;
 
@@ -219,7 +219,7 @@ public class VkGlTexture {
             return -1;
 
         return switch (pName) {
-            case GL11.GL_TEXTURE_INTERNAL_FORMAT -> GlUtil.getGlFormat(boundTexture.vulkanImage.format);
+            case GL11.GL_TEXTURE_INTERNAL_FORMAT -> VkGlUtil.getGlFormat(boundTexture.vulkanImage.format);
             case GL11.GL_TEXTURE_WIDTH -> boundTexture.vulkanImage.width;
             case GL11.GL_TEXTURE_HEIGHT -> boundTexture.vulkanImage.height;
 
@@ -295,7 +295,7 @@ public class VkGlTexture {
         }
 
         if (level == 0) {
-            int vkFormat = GlUtil.vulkanFormat(internalFormat, type);
+            int vkFormat = VkGlUtil.vulkanFormat(internalFormat, type);
 
             if (this.vulkanImage == null || this.width != width || this.height != height || vkFormat != vulkanImage.format) {
                 this.width = width;
@@ -356,9 +356,9 @@ public class VkGlTexture {
     private void uploadSubImage(int level, int xOffset, int yOffset, int width, int height, int format, ByteBuffer pixels) {
         ByteBuffer src;
         if (format == GL11.GL_RGB && vulkanImage.format == VK_FORMAT_R8G8B8A8_UNORM) {
-            src = GlUtil.RGBtoRGBA_buffer(pixels);
+            src = VkGlUtil.RGBtoRGBA_buffer(pixels);
         } else if (format == GL30.GL_BGRA && vulkanImage.format == VK_FORMAT_R8G8B8A8_UNORM) {
-            src = GlUtil.BGRAtoRGBA_buffer(pixels);
+            src = VkGlUtil.BGRAtoRGBA_buffer(pixels);
         } else {
             src = pixels;
         }
