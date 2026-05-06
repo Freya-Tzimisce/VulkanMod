@@ -1,17 +1,17 @@
 package net.vulkanmod.mixin.texture.mip;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import net.minecraft.Util;
 import net.minecraft.client.renderer.texture.MipmapGenerator;
 import net.vulkanmod.mixin.texture.image.NativeImageAccessor;
-import org.lwjgl.opengl.GL30;
 import org.lwjgl.system.MemoryUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(MipmapGenerator.class)
-public abstract class MipmapGeneratorM {
+public abstract class MipmapGeneratorMixin {
+    @Unique
     private static final int ALPHA_CUTOFF = 50;
 
     @Shadow
@@ -59,7 +59,7 @@ public abstract class MipmapGeneratorM {
 
             }
 
-            for(int j = 1; j <= i; ++j) {
+            for (int j = 1; j <= i; ++j) {
                 if (j < nativeImages.length) {
                     nativeImages2[j] = nativeImages[j];
                 } else {
@@ -74,10 +74,10 @@ public abstract class MipmapGeneratorM {
 
                     for(int m = 0; m < width; ++m) {
                         for(int n = 0; n < height; ++n) {
-                            int p0 = MemoryUtil.memGetInt(srcPtr + ((m * 2 + 0) + ((n * 2 + 0) * width2)) * 4L);
-                            int p1 = MemoryUtil.memGetInt(srcPtr + ((m * 2 + 1) + ((n * 2 + 0) * width2)) * 4L);
-                            int p2 = MemoryUtil.memGetInt(srcPtr + ((m * 2 + 0) + ((n * 2 + 1) * width2)) * 4L);
-                            int p3 = MemoryUtil.memGetInt(srcPtr + ((m * 2 + 1) + ((n * 2 + 1) * width2)) * 4L);
+                            int p0 = MemoryUtil.memGetInt(srcPtr + ((m * 2L + 0) + ((n * 2L + 0) * width2)) * 4L);
+                            int p1 = MemoryUtil.memGetInt(srcPtr + ((m * 2L + 1) + ((n * 2L + 0) * width2)) * 4L);
+                            int p2 = MemoryUtil.memGetInt(srcPtr + ((m * 2L + 0) + ((n * 2L + 1) * width2)) * 4L);
+                            int p3 = MemoryUtil.memGetInt(srcPtr + ((m * 2L + 1) + ((n * 2L + 1) * width2)) * 4L);
 
                             int outColor = blend(p0, p1, p2, p3);
                             MemoryUtil.memPutInt(dstPtr + (m + (long) n * width) * 4L, outColor);
@@ -92,10 +92,11 @@ public abstract class MipmapGeneratorM {
         }
     }
 
+    @Unique
     private static boolean hasTransparentPixel(long ptr, int width, int height) {
         for(int i = 0; i < width; ++i) {
             for(int j = 0; j < height; ++j) {
-                if (getPixelA(MemoryUtil.memGetInt(ptr + (i + j * width) * 4L)) == 0) {
+                if (getPixelA(MemoryUtil.memGetInt(ptr + (i + (long) j * width) * 4L)) == 0) {
                     return true;
                 }
             }
@@ -104,6 +105,7 @@ public abstract class MipmapGeneratorM {
         return false;
     }
 
+    @Unique
     private static int blend(int p0, int p1, int p2, int p3) {
         int a = gammaBlend(p0, p1, p2, p3, 24);
 //        int a = ((p0 >> 24 & 0xFF) + (p1 >> 24 & 0xFF) + (p2 >> 24 & 0xFF) + (p3 >> 24 & 0xFF)) >> 2;
@@ -113,10 +115,12 @@ public abstract class MipmapGeneratorM {
         return a << 24 | b << 16 | g << 8 | r;
     }
 
+    @Unique
     private static int getMax(int i0, int i1, int i2, int i3) {
         return Math.max(Math.max(Math.max(i0, i1), i2), i3);
     }
 
+    @Unique
     private static int gammaBlend(int i, int j, int k, int l, int m) {
         float f = getPow22(i >> m);
         float g = getPow22(j >> m);
@@ -126,10 +130,12 @@ public abstract class MipmapGeneratorM {
         return (int)((double)o * 255.0);
     }
 
+    @Unique
     private static int getPixelA(int rgba) {
         return rgba >> 24;
     }
 
+    @Unique
     @SuppressWarnings("UnreachableCode")
     private static int calculateAverage(NativeImage nativeImage) {
         final int width = nativeImage.getWidth();
@@ -139,8 +145,8 @@ public abstract class MipmapGeneratorM {
         int count = 0;
         long srcPtr = ((NativeImageAccessor)(Object)nativeImage).getPixels();
 
-        for(int i = 0; i < width; ++i) {
-            for(int j = 0; j < height; ++j) {
+        for ( int i = 0; i < width; ++i) {
+            for (int j = 0; j < height; ++j) {
 //                int value = nativeImage.getPixelRGBA(i, j);
                 int value = MemoryUtil.memGetInt(srcPtr + (i + (long) j * width) * 4L);
                 if (((value >> 24) & 0xFF) > 0) {
@@ -159,8 +165,9 @@ public abstract class MipmapGeneratorM {
             sumB += (values[i] >> 16) & 0xFF;
         }
 
-        if(count == 0)
+        if (count == 0) {
             return 0;
+        }
 
         sumR /= count;
         sumG /= count;

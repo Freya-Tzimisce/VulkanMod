@@ -1,7 +1,5 @@
 package net.vulkanmod.render.chunk.util;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Iterator;
 import java.util.function.Consumer;
 
@@ -77,7 +75,6 @@ public class StaticQueue<T> implements Iterable<T> {
         };
     }
 
-    @NotNull
     @Override
     public Iterator<T> iterator() {
         return iterator(false);

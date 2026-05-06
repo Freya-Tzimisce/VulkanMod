@@ -27,13 +27,10 @@ import java.util.SortedSet;
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererMixin {
 
-    @Shadow @Final
-    private RenderBuffers renderBuffers;
+    @Shadow @Final private RenderBuffers renderBuffers;
+    @Shadow @Final private Long2ObjectMap<SortedSet<BlockDestructionProgress>> destructionProgress;
 
-    @Shadow @Final
-    private Long2ObjectMap<SortedSet<BlockDestructionProgress>> destructionProgress;
-
-    private WorldRenderer worldRenderer;
+    @Unique private WorldRenderer worldRenderer;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(Minecraft minecraft, EntityRenderDispatcher entityRenderDispatcher, BlockEntityRenderDispatcher blockEntityRenderDispatcher, RenderBuffers renderBuffers, CallbackInfo ci) {

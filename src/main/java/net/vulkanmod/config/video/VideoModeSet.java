@@ -37,32 +37,35 @@ public class VideoModeSet {
 		this.refreshRates.add(refreshRate);
 	}
 
-//	public String toString() {
-//		return this.width + " x " + this.height;
-//	}
+	@Deprecated(forRemoval = true)
+	public String toString() {
+		return this.width + " x " + this.height;
+	}
 
-//	@Override
-//	public boolean equals(Object o) {
-//		if (this == o) {
-//			return true;
-//		}
-//		if (o == null || getClass() != o.getClass()) {
-//			return false;
-//		}
+	@Override
+	@Deprecated(forRemoval = true)
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 
-//		VideoModeSet that = (VideoModeSet) o;
-//		return width == that.width && height == that.height && redBits == that.redBits && greenBits == that.greenBits && blueBits == that.blueBits && refreshRates.equals(that.refreshRates);
-//	}
+		VideoModeSet that = (VideoModeSet) o;
+		return width == that.width && height == that.height && redBits == that.redBits && greenBits == that.greenBits && blueBits == that.blueBits && refreshRates.equals(that.refreshRates);
+	}
 
-//	public VideoMode getVideoMode(int refresh) {
-//		int index = refreshRates.indexOf(refresh);
+	@Deprecated(forRemoval = true)
+	public VideoMode getVideoMode(int refresh) {
+		int index = refreshRates.indexOf(refresh);
 
-//		if (index == -1) {
-//			index = 0;
-//		}
+		if (index == -1) {
+			index = 0;
+		}
 
-//		return new VideoMode(this.width, this.height, this.redBits, this.greenBits, this.blueBits, this.refreshRates.get(index));
-//	}
+		return new VideoMode(this.width, this.height, this.redBits, this.greenBits, this.blueBits, this.refreshRates.get(index));
+	}
 
 	public VideoMode getVideoMode() {
 		return new VideoMode(this.width, this.height, this.redBits, this.greenBits, this.blueBits, this.refreshRates.getLast());

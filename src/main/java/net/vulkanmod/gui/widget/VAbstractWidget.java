@@ -39,7 +39,7 @@ public abstract class VAbstractWidget extends GuiElement {
         if (hoverMultiplier > 0.0f) {
 //            int color = ColorUtil.ARGB.pack(0.5f, 0.5f, 0.5f, hoverMultiplier * 0.2f);
             int color = ColorUtil.ARGB.pack(0.3f, 0.0f, 0.0f, hoverMultiplier * 0.2f);
-//            int color = ColorUtil.ARGB.multiplyAlpha(VOptionScreen.RED, hoverMultiplier);
+//            int color = ColorUtil.ARGB.multiplyAlpha(VideoOptionScreen.RED, hoverMultiplier);
             GuiRenderer.fill(this.x - xPadding, this.y - yPadding, this.x + this.width + xPadding, this.y + this.height + yPadding, color);
 
 //            color = ColorUtil.ARGB.pack(1.0f, 1.0f, 1.0f, hoverMultiplier * 0.8f);

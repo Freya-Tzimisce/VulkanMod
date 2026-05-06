@@ -2,6 +2,7 @@ package net.vulkanmod.mixin.texture.update;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.GpuTexture;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GameRenderer;
@@ -23,25 +24,24 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LightTexture.class)
-public class MLightTexture {
+public class LightTextureMixin {
     @Shadow @Final private Minecraft minecraft;
     @Shadow @Final private GameRenderer renderer;
 
     @Shadow private boolean updateLightTexture;
     @Shadow private float blockLightRedFlicker;
 
-    private DynamicTexture lightTexture;
-    private NativeImage lightPixels;
-
-    private Vector3f[] tempVecs;
+    @Unique private DynamicTexture lightTexture;
+    @Unique private NativeImage lightPixels;
+    @Unique private Vector3f[] tempVecs;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onInit(GameRenderer gameRenderer, Minecraft minecraft, CallbackInfo ci) {
@@ -50,6 +50,7 @@ public class MLightTexture {
         this.tempVecs = new Vector3f[]{new Vector3f(), new Vector3f(), new Vector3f()};
     }
 
+    @Unique
     private void initLightMap() {
         this.lightTexture = new DynamicTexture("Light Texture", 16, 16, false);
         this.lightPixels = this.lightTexture.getPixels();
@@ -63,13 +64,9 @@ public class MLightTexture {
         this.lightTexture.upload();
     }
 
-    /**
-     * @author
-     * @reason
-     */
-    @Overwrite
-    public void turnOnLightLayer() {
-        RenderSystem.setShaderTexture(2, this.lightTexture.getTexture());
+    @Redirect(method = "turnOnLightLayer", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderTexture(ILcom/mojang/blaze3d/textures/GpuTexture;)V"))
+    public void onTurnOnLightLayer(int i, GpuTexture gpuTexture) {
+        RenderSystem.setShaderTexture(i, this.lightTexture.getTexture());
     }
 
     @Inject(method = "updateLightTexture", at = @At("HEAD"), cancellable = true)

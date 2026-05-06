@@ -17,7 +17,7 @@ public class ChunkArea {
 
     int sectionsContained = 0;
 
-    //Help JIT optimisations by hardcoding the queue size to the max possible ChunkArea limit
+    // Help JIT optimisations by hardcoding the queue size to the max possible ChunkArea limit
     public final StaticQueue<RenderSection> sectionQueue = new StaticQueue<>(512);
 
     public ChunkArea(int i, Vector3i origin, int minHeight) {
@@ -36,18 +36,17 @@ public class ChunkArea {
             int width = 8 << 4;
             int l = width >> 1;
 
-            for(int x1 = 0; x1 < 2; x1++) {
+            for (int x1 = 0; x1 < 2; x1++) {
                 float xMin = this.position.x() + (x1 * l);
                 float xMax = xMin + l;
-                for(int y1 = 0; y1 < 2; y1++) {
+                for (int y1 = 0; y1 < 2; y1++) {
                     float yMin = this.position.y() + (y1 * l);
                     float yMax = yMin + l;
                     for (int z1 = 0; z1 < 2; z1++) {
                         float zMin = this.position.z() + (z1 * l);
                         float zMax = zMin + l;
 
-                        frustumResult = frustum.cubeInFrustum(xMin, yMin, zMin,
-                                xMax , yMax, zMax);
+                        frustumResult = frustum.cubeInFrustum(xMin, yMin, zMin, xMax , yMax, zMax);
 
                         int beginIdx = (x1 << 5) + (y1 << 4) + (z1 << 3);
                         if (frustumResult == FrustumIntersection.INTERSECT) {
@@ -62,8 +61,7 @@ public class ChunkArea {
                                         float zMin2 = zMin + z2 * l2;
                                         float zMax2 = zMin2 + l2;
 
-                                        frustumResult = frustum.cubeInFrustum(xMin2, yMin2, zMin2,
-                                                xMax2, yMax2, zMax2);
+                                        frustumResult = frustum.cubeInFrustum(xMin2, yMin2, zMin2, xMax2, yMax2, zMax2);
 
                                         int idx = beginIdx + (x2 << 2) + (y2 << 1) + z2;
 
@@ -72,11 +70,10 @@ public class ChunkArea {
 
                                 }
                             }
-                        }
-                        else {
+                        } else {
                             int end = beginIdx + 8;
 
-                            for(int i = beginIdx; i < end; ++i) {
+                            for (int i = beginIdx; i < end; ++i) {
                                 this.frustumBuffer[i] = (byte) frustumResult;
                             }
                         }

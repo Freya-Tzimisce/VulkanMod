@@ -23,7 +23,7 @@ import net.vulkanmod.vulkan.util.ColorUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VOptionScreen extends Screen {
+public class VideoOptionScreen extends Screen {
     public static final int RED = ColorUtil.ARGB.pack(0.3f, 0.0f, 0.0f, 0.8f);
     final ResourceLocation ICON = ResourceLocation.fromNamespaceAndPath("vulkanmod", "vlogo_transparent.png");
 
@@ -45,7 +45,7 @@ public class VOptionScreen extends Screen {
     private final List<VButtonWidget> pageButtons = Lists.newArrayList();
     private final List<VButtonWidget> buttons = Lists.newArrayList();
 
-    public VOptionScreen(Component title, Screen parent) {
+    public VideoOptionScreen(Component title, Screen parent) {
         super(title);
         this.parent = parent;
 

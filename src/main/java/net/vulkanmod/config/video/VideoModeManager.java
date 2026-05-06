@@ -1,6 +1,7 @@
 package net.vulkanmod.config.video;
 
 import com.mojang.blaze3d.platform.VideoMode;
+import net.vulkanmod.config.ConfigManager;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -10,7 +11,8 @@ public abstract class VideoModeManager {
 	private static VideoMode osVideoMode;
 	private static VideoModeSet[] videoModeSets;
 
-//	public static VideoMode selectedVideoMode;
+	@Deprecated(forRemoval = true)
+	public static VideoMode selectedVideoMode;
 
 	public static void init() {
 		long monitor = GLFW.glfwGetPrimaryMonitor();
@@ -18,13 +20,15 @@ public abstract class VideoModeManager {
 		videoModeSets = populateVideoResolutions(monitor);
 	}
 
-//	public static void applySelectedVideoMode() {
-//		ConfigManager.getConfig().videoMode = selectedVideoMode;
-//	}
+	@Deprecated(forRemoval = true)
+	public static void applySelectedVideoMode() {
+		ConfigManager.getConfig().videoMode = selectedVideoMode;
+	}
 
-//	public static VideoModeSet[] getVideoResolutions() {
-//		return videoModeSets;
-//	}
+	@Deprecated(forRemoval = true)
+	public static VideoModeSet[] getVideoResolutions() {
+		return videoModeSets;
+	}
 
 	public static VideoModeSet getFirstAvailable() {
 		return videoModeSets[videoModeSets.length - 1];

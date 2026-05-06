@@ -12,11 +12,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GameRenderer.class)
-public abstract class GameRendererM {
-
-    @Shadow
-    @Final
-    Minecraft minecraft;
+public abstract class GameRendererMixin {
+    @Shadow @Final private Minecraft minecraft;
 
     @Inject(method = "render", at = @At("HEAD"))
     private void onRender(DeltaTracker deltaTracker, boolean bl, CallbackInfo ci) {

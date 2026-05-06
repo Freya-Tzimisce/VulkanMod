@@ -12,14 +12,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(SpriteContents.Ticker.class)
-public class MSpriteContents {
+public class SpriteContentsMixin {
+    @Shadow @Final SpriteContents.AnimatedTexture animationInfo;
 
     @Shadow int subFrame;
     @Shadow int frame;
-    @Shadow @Final SpriteContents.AnimatedTexture animationInfo;
 
     @Inject(method = "tickAndUpload", at = @At("HEAD"), cancellable = true)
-    private void checkUpload(int i, int j, GpuTexture gpuTexture, CallbackInfo ci) {
+    private void onTickAndUpload(int i, int j, GpuTexture gpuTexture, CallbackInfo ci) {
         if (!SpriteUpdateUtil.doUploadFrame()) {
             // Update animations frames even if no upload is scheduled
             this.subFrame++;
